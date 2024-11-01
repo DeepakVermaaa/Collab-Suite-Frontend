@@ -1,0 +1,54 @@
+<html lang="en">
+<body>
+    <div class="page-container">
+        <h1 class="app-title">SyncSpace</h1>
+        <div class="login-container">
+            <div class="login-form">
+                <h2>Ready to Sync?</h2>
+                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                    <div class="form-group">
+                        <input type="text" id="username" formControlName="username" required>
+                        <label for="username">Username</label>
+                        <div *ngIf="usernameControl?.invalid && (usernameControl?.dirty || usernameControl?.touched)"
+                            class="error-message">
+                            <small *ngIf="usernameControl?.errors?.['required']">Username is required.</small>
+                            <small *ngIf="usernameControl?.errors?.['minlength']">Username must be at least 3 characters
+                                long.</small>
+                            <small *ngIf="usernameControl?.errors?.['maxlength']">Username cannot exceed 100 characters.</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
+                            required>
+                        <label for="password">Password</label>
+                        <i class="fas" [class.fa-eye]="showPassword" [class.fa-eye-slash]="!showPassword"
+                            (click)="togglePasswordVisibility()"></i>
+                        <div *ngIf="passwordControl?.invalid && (passwordControl?.dirty || passwordControl?.touched)"
+                            class="error-message">
+                            <small *ngIf="passwordControl?.errors?.['required']">Password is required.</small>
+                            <small *ngIf="passwordControl?.errors?.['minlength']">Password must be at least 6 characters.
+                                long.</small>
+                            <small *ngIf="passwordControl?.errors?.['maxlength']">Password cannot exceed 50 characters.</small>
+                        </div>
+                    </div>
+                    <div class="forgot-password">
+                        <a href="#">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="login-button" [disabled]="loginForm.invalid">Login</button>
+                </form>
+                <div class="social-login">
+                    <p>or connect with</p>
+                    <div class="social-icons">
+                        <div id="google-signin-button"></div>
+                        <a href="#" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon github"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="signup-link">
+                    New to SyncSpace? <a routerLink="/sign-up">Sign up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

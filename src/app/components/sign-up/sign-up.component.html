@@ -1,0 +1,116 @@
+<html lang="en">
+
+<body>
+    <div class="page-container">
+        <h1 class="app-title">SyncSpace</h1>
+        <div class="signup-container">
+            <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()" class="signup-form">
+                <h2>Join SyncSpace</h2>
+                
+                <div class="form-group">
+                    <input type="text" id="firstName" formControlName="firstName" required>
+                    <label for="firstName">First Name</label>
+                    <div *ngIf="firstNameControl?.invalid && (firstNameControl?.dirty || firstNameControl?.touched)"
+                        class="error-message">
+                        <small *ngIf="firstNameControl?.errors?.['required']">First name is required.</small>
+                        <small *ngIf="firstNameControl?.errors?.['minlength']">First name must be at least 2 characters long.</small>
+                        <small *ngIf="firstNameControl?.errors?.['maxlength']">First name cannot exceed 100 characters.</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="lastName" formControlName="lastName" required>
+                    <label for="lastName">Last Name</label>
+                    <div *ngIf="lastNameControl?.invalid && (lastNameControl?.dirty || lastNameControl?.touched)"
+                        class="error-message">
+                        <small *ngIf="lastNameControl?.errors?.['required']">Last name is required.</small>
+                        <small *ngIf="lastNameControl?.errors?.['minlength']">Last name must be at least 2 characters long.</small>
+                        <small *ngIf="lastNameControl?.errors?.['maxlength']">Last name cannot exceed 100 characters.</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="username" formControlName="username" required>
+                    <label for="username">Username</label>
+                    <div *ngIf="usernameControl?.invalid && (usernameControl?.dirty || usernameControl?.touched)"
+                        class="error-message">
+                        <small *ngIf="usernameControl?.errors?.['required']">Username is required.</small>
+                        <small *ngIf="usernameControl?.errors?.['minlength']">Username must be at least 3 characters long.</small>
+                        <small *ngIf="usernameControl?.errors?.['maxlength']">Username cannot exceed 30 characters.</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="email" id="email" formControlName="email" required>
+                    <label for="email">Email</label>
+                    <div *ngIf="emailControl?.invalid && (emailControl?.dirty || emailControl?.touched)"
+                        class="error-message">
+                        <small *ngIf="emailControl?.errors?.['required']">Email is required.</small>
+                        <small *ngIf="emailControl?.errors?.['email']">Please enter a valid email address.</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password" required>
+                    <label for="password">Password</label>
+                    <i class="fas" [class.fa-eye]="showPassword" [class.fa-eye-slash]="!showPassword"
+                        (click)="togglePasswordVisibility()"></i>
+                    <div *ngIf="passwordControl?.invalid && (passwordControl?.dirty || passwordControl?.touched)"
+                        class="error-message">
+                        <small *ngIf="passwordControl?.errors?.['required']">Password is required.</small>
+                        <small *ngIf="passwordControl?.errors?.['minlength']">Password must be at least 8 characters long.</small>
+                        <small *ngIf="passwordControl?.errors?.['maxlength']">Password cannot exceed 50 characters.</small> 
+                    </div>
+                    <!-- Password Strength Indicator -->
+                    <div class="password-strength" *ngIf="passwordControl?.value">
+                        <div class="strength-meter" [ngClass]="{
+                            'weak': passwordStrength.score <= 2,
+                            'medium': passwordStrength.score === 3,
+                            'strong': passwordStrength.score === 4
+                        }" [style.width.%]="passwordStrength.score * 25"></div>
+                        <small class="strength-text" [ngClass]="{
+                            'text-danger': passwordStrength.score <= 2,
+                            'text-warning': passwordStrength.score === 3,
+                            'text-success': passwordStrength.score === 4
+                        }">{{passwordStrength.feedback}}</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword"
+                        formControlName="confirmPassword" required>
+                    <label for="confirmPassword">Confirm Password</label>
+                    <i class="fas" [class.fa-eye]="showConfirmPassword" [class.fa-eye-slash]="!showConfirmPassword"
+                        (click)="toggleConfirmPasswordVisibility()"></i>
+                    <div *ngIf="confirmPasswordControl?.invalid && (confirmPasswordControl?.dirty || confirmPasswordControl?.touched)"
+                        class="error-message">
+                        <small *ngIf="confirmPasswordControl?.errors?.['required']">Confirm password is required.</small>
+                    </div>
+                    <div *ngIf="signUpForm.errors?.['mismatch'] && (confirmPasswordControl?.dirty || confirmPasswordControl?.touched)"
+                        class="error-message">
+                        <small>Passwords do not match.</small>
+                    </div>
+                </div>
+
+                <div class="signup-button-container">
+                    <button type="submit" class="signup-button" [disabled]="signUpForm.invalid">Sign Up</button>
+                </div>
+
+                <div class="social-signup">
+                    <p>or sign up with</p>
+                    <div class="social-icons">
+                        <div id="google-signin-button" class=".social-icon .social-icon:hover"></div>
+                        <a href="#" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon github"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+
+                <div class="login-link">
+                    Already have an account? <a routerLink="/login">Log in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

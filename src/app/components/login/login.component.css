@@ -1,0 +1,256 @@
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 0 2rem 2rem 2rem;
+    box-sizing: border-box;
+}
+
+.app-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4rem;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    transition: all 0.3s ease;
+}
+
+.login-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.login-form {
+    padding: 0.8rem 2rem 2rem 2rem;
+}
+
+h2 {
+    color: #333;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+input {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 16px;
+    color: #333;
+    border: none;
+    border-bottom: 2px solid #d1d1d1;
+    outline: none;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+/* styles for the eye icon */
+.fas {
+    position: absolute;
+    right: 0;
+    top: 18px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.fas:hover {
+    color: #667eea;
+}
+
+label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px 0;
+    font-size: 16px;
+    color: #666;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+input:focus ~ label,
+input:valid ~ label {
+    top: -20px;
+    font-size: 12px;
+    color: #667eea;
+}
+
+input:focus {
+    border-bottom: 2px solid #667eea;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 0;
+    top: 10px;
+    cursor: pointer;
+    color: #666;
+}
+
+.forgot-password {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.forgot-password a {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 5px;
+  }
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-button:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.social-login {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.social-login p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-icon:hover {
+    transform: translateY(-3px);
+}
+
+.social-icon.google { background-color: #DB4437; }
+.social-icon.facebook { background-color: #4267B2; }
+.social-icon.github { background-color: #333; }
+
+.signup-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.signup-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.password-strength {
+    height: 4px;
+    margin-top: 8px;
+    transition: all 0.3s ease;
+}
+
+.strength-meter {
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+.strength-meter.weak {
+    background-color: #ff4136;
+}
+
+.strength-meter.medium {
+    background-color: #ffdc00;
+}
+
+.strength-meter.strong {
+    background-color: #2ecc40;
+}
+
+.strength-text {
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.text-danger {
+    color: #ff4136;
+}
+
+.text-warning {
+    color: #ffdc00;
+}
+
+.text-success {
+    color: #2ecc40;
+}
+
+@media (max-width: 480px) {
+    .app-title {
+        font-size: 3rem;
+    }
+    
+    .login-container {
+        max-width: 100%;
+    }
+}

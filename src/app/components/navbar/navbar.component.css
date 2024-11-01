@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+.text-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.sync, .space {
+  color: #FFFFFF;
+  transition: all 0.3s ease;
+}
+
+.text-logo:hover .sync {
+  color: #E0E0E0;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.text-logo:hover .space {
+  color: #F5F5F5;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.sidebar {
+    width: 250px;
+    background: linear-gradient(180deg, #4a4c8f 0%, #2c2e50 100%);
+    color: #e0e0e0;
+    padding: 13px 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    height: 100vh;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logo-container {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 0 20px 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .app-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 30px;
+    margin: 0;
+  }
+  
+  .nav-links {
+    list-style-type: none;
+    padding: 0 20px;
+  }
+  
+  .nav-links li {
+    margin-bottom: 10px;
+  }
+  
+  .nav-links a {
+    color: #e0e0e0;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .nav-links a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+  }
+  
+  .nav-links a.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .nav-links i {
+    margin-right: 15px;
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+  }
+  
+  .user-info {
+    margin-top: auto;
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 5px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .user-name {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .logout-btn {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 15px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  
+  .logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+  
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      left: -250px;
+      z-index: 1000;
+    }
+  
+    .sidebar.open {
+      left: 0;
+    }
+  }

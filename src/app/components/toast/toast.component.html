@@ -1,0 +1,23 @@
+<div class="toast-container" [@toastTrigger]="state">
+  <div class="toast" [ngClass]="{'toast-error': type === 'error', 'toast-success': type === 'success'}">
+    <div class="toast-content">
+      <i class="icon" [ngClass]="{'icon-error': type === 'error', 'icon-success': type === 'success'}">
+        <svg *ngIf="type === 'error'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="icon-svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <svg *ngIf="type === 'success'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="icon-svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </i>
+      <div class="message">
+        <span class="description">{{message}}</span>
+      </div>
+    </div>
+    <button class="close" (click)="hide()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="progress"></div>
+  </div>
+</div>

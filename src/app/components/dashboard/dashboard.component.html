@@ -1,0 +1,19 @@
+<!-- dashboard.component.html -->
+<div class="dashboard-container">
+  <app-navbar [class.closed]="!isSidebarOpen"></app-navbar>
+  <main class="main-content" [class.expanded]="!isSidebarOpen">
+      <header class="top-bar">
+          <button class="menu-toggle" (click)="toggleSidebar()">
+              <i class="fas fa-bars"></i>
+          </button>
+          <h2 class="page-title">{{ pageTitle }}</h2>
+          <div class="user-actions">
+              <app-notification></app-notification>
+              <button class="btn-icon"><i class="fas fa-cog"></i></button>
+          </div>
+      </header>
+      <div class="content-area">
+          <router-outlet></router-outlet>
+      </div>
+  </main>
+</div>
