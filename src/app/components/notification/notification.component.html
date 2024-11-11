@@ -1,3 +1,4 @@
+<!-- notification.component.html -->
 <div class="notification-wrapper">
     <button class="notification-button" (click)="toggleNotifications($event)">
         <i class="fas fa-bell"></i>
@@ -6,12 +7,12 @@
         </span>
     </button>
 
-    <div *ngIf="showNotifications" class="notification-panel">
+    <div *ngIf="showNotifications" class="notification-panel" @fadeSlide>
         <div class="notification-header">
             <div class="header-content">
                 <h3>Notifications</h3>
                 <button *ngIf="unreadCount > 0" 
-                        (click)="markAllAsRead()"
+                        (click)="markAllAsRead($event)"
                         class="mark-all-button">
                     Mark all as read
                 </button>
@@ -32,12 +33,37 @@
                             {{notification.createdAt | date:'dd/MM/yyyy HH:mm'}}
                         </span>
                     </div>
-                    <button *ngIf="!notification.isRead"
-                            (click)="markAsRead(notification.id)"
-                            class="mark-read-button"
-                            title="Mark as read">
-                        <i class="fas fa-check"></i>
-                    </button>
+                    <div class="notification-actions">
+                        <button *ngIf="!notification.isRead"
+                                (click)="markAsRead($event, notification.id)"
+                                class="mark-read-button"
+                                title="Mark as read">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="delete-button"
+                                (click)="initiateDelete($event, notification.id)"
+                                title="Delete notification"
+                                [class.active]="showDeleteConfirm === notification.id">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Delete Confirmation -->
+                <div *ngIf="showDeleteConfirm === notification.id" 
+                     class="delete-confirmation" 
+                     @fadeSlide>
+                    <p>Delete this notification?</p>
+                    <div class="confirmation-actions">
+                        <button class="confirm-button" 
+                                (click)="confirmDelete($event, notification.id)">
+                            Delete
+                        </button>
+                        <button class="cancel-button" 
+                                (click)="cancelDelete($event)">
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

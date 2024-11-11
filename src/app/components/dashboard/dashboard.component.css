@@ -1,4 +1,3 @@
-
 .dashboard-container {
   display: flex;
   height: 100vh;
@@ -13,8 +12,8 @@
 }
 
 .top-bar {
-  background-color: white;
-  padding: 15px 30px;
+  background-color: #f8f9ff;
+  padding: 15px 15px 7.5px 15px;
   display: flex;
   align-items: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -30,9 +29,11 @@
 
 .page-title {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   flex-grow: 1;
+  color: #24252b;
+  letter-spacing: -0.2px;
 }
 
 app-navbar {
@@ -58,13 +59,9 @@ app-navbar.closed {
   color: #667eea;
 }
 
-.content-area {
-  padding: 30px;
-}
-
 .main-content {
   flex-grow: 1;
-  background-color: #f0f2f5;
+  background-color: #f5f6f6;
   overflow-y: auto;
   margin-left: 0;
   transition: margin-left 0.3s ease-in-out;

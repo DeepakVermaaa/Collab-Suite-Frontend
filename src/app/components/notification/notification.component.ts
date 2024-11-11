@@ -9,21 +9,35 @@ import { trigger, transition, style, animate } from '@angular/animations';
     selector: 'app-notification',
     templateUrl: './notification.component.html',
     styleUrls: ['./notification.component.css'],
+    animations: [
+        trigger('fadeSlide', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateY(-10px)' }),
+                animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+            ]),
+            transition(':leave', [
+                animate('200ms ease-in', style({ opacity: 0, transform: 'translateY(-10px)' }))
+            ])
+        ])
+    ]
 })
 export class NotificationComponent implements OnInit, OnDestroy {
     notifications: Notification[] = [];
     unreadCount = 0;
     showNotifications = false;
+    showDeleteConfirm: number | null = null;
     private subscriptions: Subscription[] = [];
 
-    constructor(private notificationService: NotificationService,
-      private eRef: ElementRef
+    constructor(
+        private notificationService: NotificationService,
+        private eRef: ElementRef
     ) {}
 
     @HostListener('document:click', ['$event'])
     clickout(event: any) {
         if (!this.eRef.nativeElement.contains(event.target)) {
             this.showNotifications = false;
+            this.showDeleteConfirm = null;
         }
     }
 
@@ -44,14 +58,33 @@ export class NotificationComponent implements OnInit, OnDestroy {
     toggleNotifications(event: Event) {
         event.stopPropagation();
         this.showNotifications = !this.showNotifications;
+        this.showDeleteConfirm = null; // Reset delete confirmation when toggling
     }
 
-    markAsRead(id: number) {
+    markAsRead(event: Event, id: number) {
+        event.stopPropagation();
         this.notificationService.markAsRead(id);
     }
 
-    markAllAsRead() {
+    markAllAsRead(event: Event) {
+        event.stopPropagation();
         this.notificationService.markAllAsRead();
+    }
+
+    initiateDelete(event: Event, id: number) {
+        event.stopPropagation();
+        this.showDeleteConfirm = id;
+    }
+
+    confirmDelete(event: Event, id: number) {
+        event.stopPropagation();
+        this.notificationService.deleteNotification(id);
+        this.showDeleteConfirm = null;
+    }
+
+    cancelDelete(event: Event) {
+        event.stopPropagation();
+        this.showDeleteConfirm = null;
     }
 
     getNotificationIcon(type: string): string {

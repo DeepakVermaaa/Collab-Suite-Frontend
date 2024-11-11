@@ -33,6 +33,18 @@
   border-left: 4px solid #16a34a;
 }
 
+.toast-warning {
+  border-left: 4px solid #f59e0b;
+}
+
+.icon-warning {
+  color: #f59e0b; 
+}
+
+.toast-warning .progress {
+  color: #f59e0b;
+}
+
 .toast-content {
   display: flex;
   align-items: center;

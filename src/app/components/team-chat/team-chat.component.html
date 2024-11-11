@@ -1,0 +1,118 @@
+<div class="chat-wrapper">
+  <!-- Sidebar -->
+  <div class="chat-sidebar">
+    <div class="search-header">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search chats...">
+      </div>
+    </div>
+
+    <div class="chat-list">
+      <div class="chat-list-header">
+        <h3>Project Chats</h3>
+        <span class="chat-count">{{chatRooms?.length || 0}}</span>
+      </div>
+
+      <div class="chat-rooms">
+        <div *ngFor="let room of chatRooms" class="chat-room" [class.active]="selectedRoom?.id === room.id"
+          (click)="selectRoom(room)">
+          <div class="room-avatar">
+            {{room?.name?.charAt(0)?.toUpperCase()}}
+          </div>
+          <div class="room-info">
+            <div class="room-name-row">
+              <h4>{{room.name}}</h4>
+              <span class="time">{{room.createdAt | date:'shortTime'}}</span>
+            </div>
+            <div class="room-preview">
+              <span class="project">{{room.projectGroup?.name}}</span>
+              <span class="member-count">{{onlineUsers.length}} online</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Chat Area -->
+  <div class="chat-main">
+    <ng-container *ngIf="selectedRoom; else noRoomSelected">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <div class="selected-room-avatar">
+            {{selectedRoom.name.charAt(0).toUpperCase()}}
+          </div>
+          <div class="selected-room-info">
+            <h2>{{selectedRoom.name}}</h2>
+            <div class="room-meta">
+              <span class="online-indicator"></span>
+              <span>{{onlineUsers.length}} online</span>
+              <span class="separator">•</span>
+              <span>{{selectedRoom.projectGroup?.name}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="error-message">
+        {{error}}
+        <button class="close-error" (click)="error = null">&times;</button>
+      </div>
+
+      <!-- Messages Area -->
+      <div class="messages-area" #messagesContainer>
+        <div class="date-separator">
+          <span>{{getFormattedDate()}}</span>
+        </div>
+
+        <div *ngFor="let message of messages" class="message" [class.own-message]="isOwnMessage(message)">
+          <div class="message-user-avatar">
+            {{message?.senderName?.charAt(0)?.toUpperCase()}}
+          </div>
+          <div class="message-content-wrapper">
+            <div class="message-info">
+              <span class="message-sender">{{message.senderName}}</span>
+              <span class="message-time">{{message.timestamp | date:'shortTime'}}</span>
+            </div>
+            <div class="message-bubble">
+              {{message.content}}
+            </div>
+          </div>
+          <div class="message-actions" *ngIf="isOwnMessage(message)">
+            <button class="message-action-btn" (click)="deleteMessage(message.id)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="chat-input-area">
+        <form [formGroup]="messageForm" (ngSubmit)="sendMessage()" class="input-form">
+          <div class="attachment-btn">
+            <i class="fas fa-plus"></i>
+          </div>
+          <input formControlName="message" type="text" placeholder="Type your message..." [disabled]="isLoading">
+          <button type="submit" [disabled]="messageForm.invalid || isLoading" class="send-btn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+    </ng-container>
+
+    <ng-template #noRoomSelected>
+      <div class="no-chat-selected">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-comments"></i>
+          </div>
+          <h3>Select a chat to start messaging</h3>
+          <p>Choose from your project chats to begin the conversation</p>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>

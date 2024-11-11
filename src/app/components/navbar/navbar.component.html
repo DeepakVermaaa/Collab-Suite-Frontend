@@ -6,12 +6,12 @@
     <!-- <h1 class="app-title">SyncSpace</h1> -->
   </div>
   <ul class="nav-links">
-    <li><a routerLink="/dashboard" routerLinkActive="active"><i class="fas fa-home"></i>Home</a></li>
-    <li><a routerLink="/dashboard/projects" routerLinkActive="active"><i class="fas fa-project-diagram"></i>Projects</a></li>
-    <li><a routerLink="/dashboard/tasks" routerLinkActive="active"><i class="fas fa-tasks"></i>Tasks</a></li>
-    <li><a routerLink="/dashboatoggleSidebarrd/documents" routerLinkActive="active"><i class="fas fa-file-alt"></i>Documents</a></li>
-    <li><a routerLink="/dashboard/chat" routerLinkActive="active"><i class="fas fa-comments"></i>Team Chat</a></li>
-    <li><a routerLink="/dashboard/analytics" routerLinkActive="active"><i class="fas fa-chart-bar"></i>Analytics</a></li>
+    <li><a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="fas fa-home"></i>Home</a></li>
+    <li><a routerLink="/dashboard/projects" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="fas fa-project-diagram"></i>Projects</a></li>
+    <li><a routerLink="/dashboard/tasks" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="fas fa-tasks"></i>Tasks</a></li>
+    <li><a routerLink="/dashboatoggleSidebarrd/documents" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="fas fa-file-alt"></i>Documents</a></li>
+    <li><a routerLink="/dashboard/chat" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="fas fa-comments"></i>Team Chat</a></li>
+    <li><a routerLink="/dashboard/analytics" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="fas fa-chart-bar"></i>Analytics</a></li>
   </ul>
   <div class="user-info">
     <img src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="User Avatar" class="user-avatar">

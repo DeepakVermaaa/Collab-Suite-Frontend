@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Notification } from '../models/Notification';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { environment } from 'environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class NotificationService {
-    private apiUrl = 'https://localhost:7297';
+    private apiUrl = environment.apiUrl;
     private hubConnection!: HubConnection;
     private notifications = new BehaviorSubject<Notification[]>([]);
     private unreadCount = new BehaviorSubject<number>(0);
@@ -19,8 +20,12 @@ export class NotificationService {
 
     /** Initializes the SignalR connection for real-time notifications */
     private initializeSignalRConnection() {
+        const token = localStorage.getItem('token');
         this.hubConnection = new HubConnectionBuilder()
-            .withUrl(`${this.apiUrl}/notificationHub`)
+            .withUrl(`${this.apiUrl}/notificationHub`, { 
+                accessTokenFactory: () => token || '',
+                withCredentials: true
+              })
             .withAutomaticReconnect()
             .build();
 
@@ -103,6 +108,19 @@ export class NotificationService {
                     this.updateUnreadCount();
                 },
                 error: (error) => console.error('Error marking all notifications as read:', error)
+            });
+    }
+
+    /** Deletes a notification and updates the local list */
+    deleteNotification(notificationId: number) {
+        return this.http.delete(`${this.apiUrl}/api/Notifications/${notificationId}`)
+            .subscribe({
+                next: () => {
+                    const updated = this.notifications.value.filter(n => n.id !== notificationId);
+                    this.notifications.next(updated);
+                    this.updateUnreadCount();
+                },
+                error: (error) => console.error('Error deleting notification:', error)
             });
     }
 }

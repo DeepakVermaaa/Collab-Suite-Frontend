@@ -34,7 +34,7 @@ export class NavbarComponent implements OnInit {
 
     logout() {
         this.authService.logout();
-        this.toastService.showSuccess("Successfully logged out.")
+        // this.toastService.showSuccess("Successfully logged out.")
         this.router.navigate(['/login']);
     }
 }

@@ -27,7 +27,7 @@ import { Component, Input, OnDestroy } from '@angular/core';
   ]
 })
 export class ToastComponent  {
-  @Input() type: 'error' | 'success' = 'success';
+  @Input() type: 'error' | 'success' | 'warning' = 'success';
   @Input() message: string = '';
   state: string = 'active';
 

@@ -13,6 +13,7 @@ import { TokenInterceptor } from './interceptors/token.interceptor';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { NotificationComponent } from './components/notification/notification.component';
+import { TeamChatComponent } from './components/team-chat/team-chat.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { NotificationComponent } from './components/notification/notification.co
     NavbarComponent,
     DashboardComponent,
     NotificationComponent,
+    TeamChatComponent,
   ],
   imports: [
     BrowserModule,

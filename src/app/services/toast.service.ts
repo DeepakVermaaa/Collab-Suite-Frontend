@@ -17,10 +17,10 @@ export class ToastService {
   /**
    * Creates and displays a toast notification.
    * @param message The message to display in the toast.
-   * @param type The type of toast ('error' or 'success').
+   * @param type The type of toast ('error', 'success' or 'warning').
    * @private
    */
-  private showToast(message: string, type: 'error' | 'success') {
+  private showToast(message: string, type: 'error' | 'success' | 'warning') {
     // Create a component reference from the component
     const componentRef = this.componentFactoryResolver
       .resolveComponentFactory(ToastComponent)
@@ -53,6 +53,10 @@ export class ToastService {
    */
   showError(message: string) {
     this.showToast(message, 'error');
+  }
+
+  showWarning(message: string) {
+    this.showToast(message, 'warning');
   }
 
   /**

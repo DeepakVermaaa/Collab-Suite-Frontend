@@ -5,13 +5,14 @@ import { catchError, tap } from 'rxjs/operators';
 import { ToastService } from './toast.service';
 import { AuthResponse } from '../models/AuthResponse';
 import { User } from '../models/User';
+import { environment } from 'environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private apiUrl = 'https://localhost:7297/api/User';
+  private apiUrl = `${environment.apiUrl}/api/User`
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
   public currentUser = this.currentUserSubject.asObservable();
 
@@ -126,10 +127,16 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
+  /** 
+   * Retrieves the current user stored in the BehaviorSubject
+   */
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
 
+  /** 
+   * Updates the current user both in local storage and the BehaviorSubject 
+   */
   updateCurrentUser(user: User) {
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUserSubject.next(user);
