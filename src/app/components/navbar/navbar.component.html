@@ -14,7 +14,9 @@
     <li><a routerLink="/dashboard/analytics" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="fas fa-chart-bar"></i>Analytics</a></li>
   </ul>
   <div class="user-info">
-    <img src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="User Avatar" class="user-avatar">
+    <img [src]="getProfilePicture()" 
+     alt="Profile Picture" 
+     class="user-avatar">
     <span class="user-name">{{ userFullName }}</span>
     <a (click)="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>

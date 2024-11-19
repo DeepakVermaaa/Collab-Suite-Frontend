@@ -1,0 +1,118 @@
+<div class="profile-container">
+    <div class="profile-content">
+        <div class="profile-header">
+            <div class="profile-picture-section">
+                <div class="profile-picture-container">
+                    <img [src]="profileImageUrl || '/assets/images/DummyImage.png'" class="profile-picture">
+                    <div class="change-photo-btn" (click)="fileInput.click()">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <input #fileInput type="file" (change)="onProfilePictureChange($event)"
+                        accept="image/jpeg,image/png,image/gif" class="hidden">
+                </div>
+                <div class="profile-info">
+                    <h2>{{user?.firstName}} {{user?.lastName}}</h2>
+                    <p class="email">{{user?.email}}</p>
+                    <div class="meta-info">
+                        <span><i class="fas fa-clock"></i> Member since {{user?.createdAt | date:'mediumDate'}}</span>
+                        <span><i class="fas fa-history"></i> Last updated {{getTimeSince(user?.updatedAt)}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="firstName" formControlName="firstName"
+                            [class.is-invalid]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+                    </div>
+                    <div class="invalid-feedback"
+                        *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+                        First name is required
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="lastName" formControlName="lastName"
+                            [class.is-invalid]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+                    </div>
+                    <div class="invalid-feedback"
+                        *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+                        Last name is required
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" formControlName="email"
+                            [class.is-invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+                    </div>
+                    <div class="invalid-feedback"
+                        *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+                        Please enter a valid email address
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-at"></i>
+                        <input type="text" id="username" formControlName="username"
+                            [class.is-invalid]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+                    </div>
+                    <div class="invalid-feedback"
+                        *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+                        Username is required
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input [type]="showCurrentPassword ? 'text' : 'password'" id="currentPassword"
+                            formControlName="currentPassword"
+                            [class.is-invalid]="profileForm.get('currentPassword')?.invalid && profileForm.get('currentPassword')?.touched">
+                        <button type="button" class="password-toggle" (click)="togglePasswordVisibility('current')">
+                            <i class="fas" [class.fa-eye]="!showCurrentPassword"
+                                [class.fa-eye-slash]="showCurrentPassword"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback"
+                        *ngIf="profileForm.get('currentPassword')?.invalid && profileForm.get('currentPassword')?.touched">
+                        Current password is required
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">New Password (Optional)</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input [type]="showNewPassword ? 'text' : 'password'" id="newPassword"
+                            formControlName="newPassword">
+                        <button type="button" class="password-toggle" (click)="togglePasswordVisibility('new')">
+                            <i class="fas" [class.fa-eye]="!showNewPassword" [class.fa-eye-slash]="showNewPassword"></i>
+                        </button>
+                    </div>
+                    <div class="helper-text">Leave blank to keep current password*</div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="save-btn" [disabled]="isSubmitting || profileForm.invalid">
+                    <i class="fas" [class.fa-spinner]="isSubmitting" [class.fa-save]="!isSubmitting"></i>
+                    {{isSubmitting ? 'Saving...' : 'Save Changes'}}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

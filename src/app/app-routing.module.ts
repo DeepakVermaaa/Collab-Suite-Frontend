@@ -6,6 +6,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { TeamChatComponent } from './components/team-chat/team-chat.component';
 import { AuthGuard } from './guards/AuthGuard';
 import { NoAuthGuard } from './guards/NoAuthGuard';
+import { ManageProfileComponent } from './components/manage-profile/manage-profile.component';
 
 const routes: Routes = [
   { 
@@ -25,6 +26,14 @@ const routes: Routes = [
     canActivateChild: [AuthGuard],
     children: [
       { path: 'chat', component: TeamChatComponent },
+      {
+        path: 'profile',
+        component: ManageProfileComponent
+      },
+      { 
+        path: 'projects',
+        loadChildren: () => import('./components/project/project.module').then(m => m.ProjectModule)
+      }
     ]
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' },

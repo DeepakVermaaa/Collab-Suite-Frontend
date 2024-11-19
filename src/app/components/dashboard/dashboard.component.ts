@@ -35,6 +35,10 @@ export class DashboardComponent implements OnInit {
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
+  
+  navigateToProfile() {
+    this.router.navigate(['dashboard/profile']);
+  }
 
   private updatePageTitle(url: string) {
     // Extract the last segment of the URL
@@ -58,6 +62,9 @@ export class DashboardComponent implements OnInit {
         break;
       case 'analytics':
         this.pageTitle = 'Analytics';
+        break;
+      case 'profile':
+        this.pageTitle = 'Profile Settings';
         break;
       default:
         this.pageTitle = 'Dashboard';

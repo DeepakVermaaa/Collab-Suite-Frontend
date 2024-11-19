@@ -92,15 +92,20 @@
     text-align: center;
     padding: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* This centers all child elements */
+    justify-content: center;
   }
   
   .user-avatar {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    margin-bottom: 5px;
+    margin: 0 auto 5px auto;
     border: 3px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: block;
   }
   
   .user-name {

@@ -1,0 +1,191 @@
+<div class="min-h-screen bg-gray-50 project-container relative">
+  <!-- Loading Overlay -->
+  <!-- <div *ngIf="loading" class="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+  </div> -->
+
+  <!-- Controls Section -->
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
+    <div class="controls-header bg-white rounded-lg shadow-sm">
+      <!-- Header -->
+      <div class="p-6">
+        <p class="text-sm text-gray-500 mt-1">Manage and track all your team projects</p>
+      </div>
+
+      <!-- Search and Filters Row -->
+      <div class="px-6 pb-6">
+        <div class="flex flex-wrap items-center gap-4">
+          <!-- Search Bar -->
+          <div class="flex-1 min-w-[200px]">
+            <div class="relative">
+              <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input type="text" [(ngModel)]="filterParams.searchQuery" (ngModelChange)="onSearch()"
+                placeholder="Search by project name, description, or team member..."
+                class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:border-indigo-500">
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Status Filter -->
+            <select [(ngModel)]="filterParams.status" (ngModelChange)="onStatusChange($event)"
+              class="px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-[#667eea] focus:ring-2 focus:ring-[#667eea]/10 bg-white cursor-pointer">
+              <option [ngValue]="null">All Status</option>
+              <option [ngValue]="ProjectStatus.Planning">Planning</option>
+              <option [ngValue]="ProjectStatus.Active">Active</option>
+              <option [ngValue]="ProjectStatus.OnHold">On Hold</option>
+              <option [ngValue]="ProjectStatus.Completed">Completed</option>
+              <option [ngValue]="ProjectStatus.Cancelled">Cancelled</option>
+            </select>
+
+            <!-- Sort Options -->
+            <div class="flex items-center gap-2">
+              <select [(ngModel)]="filterParams.sortBy" (ngModelChange)="onSortChange()"
+                class="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:border-indigo-500 bg-white">
+                <option value="name">Sort by Name</option>
+                <option value="created">Sort by Date</option>
+                <option value="progress">Sort by Progress</option>
+                <option value="tasks">Sort by Tasks</option>
+                <option value="team-size">Sort by Team Size</option>
+              </select>
+
+              <!-- Sort Direction Toggle -->
+              <button (click)="onSortChange()" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50"
+                [title]="filterParams.sortDirection === 'asc' ? 'Ascending' : 'Descending'">
+                <i class="fa" [class.fa-sort-up]="filterParams.sortDirection === 'asc'"
+                  [class.fa-sort-down]="filterParams.sortDirection === 'desc'">
+                </i>
+              </button>
+            </div>
+
+            <!-- Create Project Button -->
+            <button (click)="openCreateProjectDialog()" style="background-color: #667eea;"
+              class="px-4 py-2 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
+              <i class="fa fa-plus"></i>
+              Create Project
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div *ngFor="let project of projects"
+        class="overflow-hidden rounded-lg bg-white shadow hover:shadow-md transition-shadow cursor-pointer"
+        (click)="navigateToProject(project.id)">
+        <div class="p-6">
+          <!-- Project Header -->
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="text-lg font-medium text-gray-900">{{project.name}}</h3>
+              <p class="mt-1 text-sm text-gray-500 line-clamp-2">{{project.description}}</p>
+            </div>
+            <div class="flex flex-col gap-2">
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                [ngClass]="getStatusClass(project.status)">
+                {{getStatusText(project.status)}}
+              </span>
+              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium" [ngClass]="{
+                                'bg-green-100 text-green-800': project.progress === 100,
+                                'bg-yellow-100 text-yellow-800': project.progress > 0 && project.progress < 100,
+                    'bg-gray-100 text-gray-800': project.progress === 0
+                  }">
+                {{project.progress}}% Complete
+              </span>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="mt-4">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Progress</span>
+              <span class="text-gray-700 font-medium">{{project.progress}}%</span>
+            </div>
+            <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+              <div class="h-2 rounded-full transition-all duration-500" [style.width.%]="project.progress" [ngClass]="{
+                    'bg-green-500': project.progress === 100,
+                    'bg-indigo-500': project.progress > 0 && project.progress < 100,
+                    'bg-gray-400': project.progress === 0
+                  }">
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Stats -->
+          <div class="mt-4 grid grid-cols-2 gap-4">
+            <div class="rounded-md bg-gray-50 p-3">
+              <p class="text-sm font-medium text-gray-500">Tasks</p>
+              <p class="mt-1 text-lg font-semibold text-gray-900">
+                {{project.taskStats.completed}}/{{project.taskStats.total}}
+              </p>
+            </div>
+            <div class="rounded-md bg-gray-50 p-3">
+              <p class="text-sm font-medium text-gray-500">Team</p>
+              <p class="mt-1 text-lg font-semibold text-gray-900">
+                {{project.members.length}}
+              </p>
+            </div>
+          </div>
+
+          <!-- Team Members -->
+          <div class="mt-4">
+            <div class="flex -space-x-2 overflow-hidden">
+              <div *ngFor="let member of project.members.slice(0, 4)"
+                class="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gray-200 flex items-center justify-center">
+                <span class="text-xs font-medium text-gray-600">
+                  {{member.firstName[0]}}{{member.lastName[0]}}
+                </span>
+              </div>
+              <div *ngIf="project.members.length > 4"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 ring-2 ring-white">
+                <span class="text-xs font-medium text-gray-600">
+                  +{{project.members.length - 4}}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Milestone -->
+          <div *ngIf="project.milestones?.length" class="mt-4">
+            <p class="text-sm font-medium text-gray-500 mb-2">Upcoming Milestone</p>
+            <div *ngFor="let milestone of getNextMilestone(project)" class="flex items-center text-sm">
+              <i class="fa fa-flag text-gray-400 mr-1"></i>
+              <span class="text-gray-900">{{milestone.title}}</span>
+              <span class="ml-auto text-gray-500">
+                {{milestone.dueDate | date:'MMM d'}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Projects Found State -->
+    <div *ngIf="projects.length === 0 && !loading" class="text-center py-12">
+      <p class="text-gray-500">No projects found matching your criteria.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="mt-6 flex justify-center">
+      <nav class="inline-flex rounded-md shadow-sm" aria-label="Pagination">
+        <button *ngFor="let page of [].constructor(totalPages); let i = index" (click)="onPageChange(i + 1)"
+          [disabled]="filterParams.pageNumber === i + 1" [class.bg-indigo-600]="filterParams.pageNumber === i + 1"
+          [class.text-white]="filterParams.pageNumber === i + 1"
+          [class.hover:bg-indigo-700]="filterParams.pageNumber === i + 1"
+          [class.bg-white]="filterParams.pageNumber !== i + 1" [class.text-gray-500]="filterParams.pageNumber !== i + 1"
+          [class.hover:bg-gray-50]="filterParams.pageNumber !== i + 1"
+          class="relative inline-flex items-center px-4 py-2 text-sm font-medium border border-gray-300 focus:z-20">
+          {{ i + 1 }}
+        </button>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Create Project Dialog -->
+<app-create-project-dialog [isOpen]="showCreateDialog" (onClose)="closeCreateProjectDialog()"
+  (projectCreated)="onProjectCreated()">
+</app-create-project-dialog>

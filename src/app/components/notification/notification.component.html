@@ -1,5 +1,5 @@
-<!-- notification.component.html -->
-<div class="notification-wrapper">
+<div class="notification-wrapper" [class.show-panel]="showNotifications">
+    <div class="notification-backdrop" (click)="toggleNotifications($event)"></div>
     <button class="notification-button" (click)="toggleNotifications($event)">
         <i class="fas fa-bell"></i>
         <span *ngIf="unreadCount > 0" class="notification-badge">
@@ -24,7 +24,7 @@
                  [class.unread]="!notification.isRead"
                  class="notification-item">
                 <div class="notification-item-content">
-                    <div class="notification-icon" [ngClass]="notification.type">
+                    <div class="notification-icon" [ngClass]="getNotificationClass(notification.type)">
                         <i [class]="getNotificationIcon(notification.type)"></i>
                     </div>
                     <div class="notification-text">

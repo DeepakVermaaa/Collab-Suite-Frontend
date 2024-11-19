@@ -1,3 +1,4 @@
+import { Project } from "../components/project/models/project.model";
 import { ProjectGroup } from "./ProjectGroup";
 
 export interface ChatRoom {
@@ -5,5 +6,5 @@ export interface ChatRoom {
     projectGroupId: number;
     name: string;
     createdAt: Date;
-    projectGroup?: ProjectGroup;
+    projectGroup?: Project;
   }

@@ -4,6 +4,8 @@ import { NotificationService } from '../../services/notification.service';
 import { Notification } from 'src/app/models/Notification';
 import { Subscription } from 'rxjs';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { NotificationHelper } from 'src/app/helpers/notification.helper';
+import { NotificationType } from 'src/app/models/NotificationType';
 
 @Component({
     selector: 'app-notification',
@@ -87,18 +89,15 @@ export class NotificationComponent implements OnInit, OnDestroy {
         this.showDeleteConfirm = null;
     }
 
-    getNotificationIcon(type: string): string {
-        switch (type) {
-            case 'TaskAssigned':
-                return 'fas fa-tasks';
-            case 'ProjectDeadline':
-                return 'fas fa-calendar-alt';
-            case 'Mention':
-                return 'fas fa-at';
-            case 'TeamUpdate':
-                return 'fas fa-users';
-            default:
-                return 'fas fa-bell';
-        }
+    getNotificationIcon(type: NotificationType): string {
+        return NotificationHelper.getNotificationIcon(type);
+    }
+
+    getNotificationClass(type: NotificationType): string {
+        return NotificationHelper.getNotificationClass(type);
+    }
+
+    getNotificationTypeString(type: NotificationType): string {
+        return NotificationHelper.getNotificationTypeString(type);
     }
 }

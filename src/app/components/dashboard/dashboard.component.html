@@ -9,7 +9,7 @@
           <h2 class="page-title">{{ pageTitle }}</h2>
           <div class="user-actions">
               <app-notification></app-notification>
-              <button class="btn-icon"><i class="fas fa-cog"></i></button>
+              <button (click)="navigateToProfile()"  class="btn-icon"><i class="fas fa-cog"></i></button>
           </div>
       </header>
       <div class="content-area">

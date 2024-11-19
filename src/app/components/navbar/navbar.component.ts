@@ -32,6 +32,11 @@ export class NavbarComponent implements OnInit {
         return 'User';
     }
 
+    //Getter method for profile picture
+    getProfilePicture(): string {
+        return this.authService.getProfilePictureUrl(this.currentUser?.profilePicture);
+      }
+
     logout() {
         this.authService.logout();
         // this.toastService.showSuccess("Successfully logged out.")

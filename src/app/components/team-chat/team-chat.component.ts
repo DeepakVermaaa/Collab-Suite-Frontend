@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ChatMessage } from 'src/app/models/ChatMessage';
 import { ChatRoom } from 'src/app/models/ChatRoom';
+import { LoaderService } from 'src/app/services/loader.service';
 
 @Component({
   selector: 'app-team-chat',
@@ -28,7 +29,8 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   constructor(
     private chatService: ChatService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private loaderService: LoaderService
   ) {
     const userString = localStorage.getItem('user') || '';
     const user = userString ? JSON.parse(userString) : null;
@@ -53,6 +55,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private async initializeChat() {
     try {
       this.isLoading = true;
+      this.loaderService.show();
       await this.chatService.startConnection();
       await this.loadChatRooms();
       this.subscribeToEvents();
@@ -61,12 +64,14 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.error = 'Failed to connect to chat service. Please try refreshing the page.';
     } finally {
       this.isLoading = false;
+      this.loaderService.hide();
     }
   }
 
   private async loadChatRooms() {
     try {
       this.chatRooms = await this.chatService.getChatRooms().toPromise();
+      console.log(this.chatRooms);
     } catch (error) {
       console.error('Error loading chat rooms:', error);
       this.error = 'Failed to load chat rooms';
@@ -93,6 +98,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (this.selectedRoom?.id !== room.id) {
       try {
         this.isLoading = true;
+        this.loaderService.show();
         if (this.selectedRoom) {
           await this.chatService.leaveGroup(this.selectedRoom.id);
         }
@@ -106,6 +112,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.selectedRoom = null;
       } finally {
         this.isLoading = false;
+        this.loaderService.hide();
       }
     }
   }
@@ -136,6 +143,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   async deleteMessage(messageId: number) {
     try {
       this.isLoading = true;
+      this.loaderService.show();
       await this.chatService.deleteMessage(messageId).toPromise();
       this.messages = this.messages.filter(m => m.id !== messageId);
       this.error = null;
@@ -144,6 +152,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.error = 'Failed to delete message';
     } finally {
       this.isLoading = false;
+      this.loaderService.hide();
     }
   }
 

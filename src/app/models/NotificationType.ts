@@ -1,8 +1,8 @@
 export enum NotificationType {
-    TaskAssigned = 'TaskAssigned',
-    TaskUpdated = 'TaskUpdated',
-    ProjectDeadline = 'ProjectDeadline',
-    Mention = 'Mention',
-    TeamUpdate = 'TeamUpdate',
-    System = 'System'
+    TaskAssigned = 1,
+    TaskUpdated = 2,
+    ProjectDeadline = 3,
+    Mention = 4,
+    TeamUpdate = 5,
+    System = 6
 }
