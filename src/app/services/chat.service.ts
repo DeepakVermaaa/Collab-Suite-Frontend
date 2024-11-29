@@ -1,4 +1,3 @@
-// services/chat.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
@@ -114,5 +113,9 @@ export class ChatService {
 
   public isConnected(): boolean {
     return this.hubConnection?.state === 'Connected';
+  }
+
+  public createChatRoom(projectId: number, name: string): Observable<ChatRoom> {
+    return this.http.post<ChatRoom>(`${this.apiUrl}/api/Chat/rooms`, { projectGroupId: projectId, name });
   }
 }

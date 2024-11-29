@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
-import { ToastService } from './toast.service';
+import { ToastService } from '../shared/toast/service/toast.service';
 import { AuthResponse } from '../models/AuthResponse';
 import { User } from '../models/User';
 import { environment } from 'environment';
@@ -24,6 +24,24 @@ export class AuthService {
    * @returns The complete URL to the profile picture
    */
   getProfilePictureUrl(profilePicturePath: string | undefined | null): string {
+    if (!profilePicturePath) {
+      return '/assets/images/DummyImage.png';
+    }
+    
+    // If the path is already a full URL, return it as is
+    if (profilePicturePath.startsWith('http')) {
+      return profilePicturePath;
+    }
+
+    // If the path starts with a slash, remove it to avoid double slashes
+    const cleanPath = profilePicturePath.startsWith('/') 
+      ? profilePicturePath.slice(1) 
+      : profilePicturePath;
+      
+    return `${environment.apiUrl}/${cleanPath}`;
+  }
+
+  getProfilePictureUrlForAnyUser(profilePicturePath: string | undefined | null): string {
     if (!profilePicturePath) {
       return '/assets/images/DummyImage.png';
     }

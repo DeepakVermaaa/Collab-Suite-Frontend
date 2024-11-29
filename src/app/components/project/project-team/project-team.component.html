@@ -1,0 +1,376 @@
+<div class="space-y-6">
+    <!-- Team Analytics Cards -->
+    <div class="grid grid-cols-4 gap-4">
+      <div class="bg-white rounded-lg border p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Core Team</p>
+            <p class="text-2xl font-semibold mt-1">{{project.members.length}}</p>
+          </div>
+          <div class="p-2 bg-blue-50 rounded-lg">
+            <i class="fas fa-users text-blue-600"></i>
+          </div>
+        </div>
+      </div>
+  
+      <div class="bg-white rounded-lg border p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Chat Rooms</p>
+            <p class="text-2xl font-semibold mt-1">{{project.chatRooms?.length || 0}}</p>
+          </div>
+          <div class="p-2 bg-purple-50 rounded-lg">
+            <i class="fas fa-comments text-purple-600"></i>
+          </div>
+        </div>
+      </div>   
+    </div>
+  
+    <!-- Main Content Area -->
+    <div class="grid grid-cols-3 gap-6">
+      <!-- Team Members Section -->
+      <div class="col-span-2">
+        <div class="bg-white rounded-lg border">
+          <div class="p-4 border-b flex justify-between items-center">
+            <div>
+              <h3 class="text-lg font-semibold">Team Members</h3>
+              <p class="text-sm text-gray-500">Project contributors and their roles</p>
+            </div>
+            <button *ngIf="canManageTeam" 
+                    (click)="onAddMember()" style="background-color: #667eea;"
+                    class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700">
+              <i class="fas fa-user-plus mr-2"></i> Add Member
+            </button>
+          </div>
+  
+          <div class="divide-y">
+            <div *ngFor="let member of project.members" 
+                 class="p-4 hover:bg-gray-50 transition-colors">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="h-10 w-10 rounded-full overflow-hidden">
+                        <img *ngIf="member.profilePicture" [src]="this.authService.getProfilePictureUrlForAnyUser(member.profilePicture)" [alt]="member.firstName + ' ' + member.lastName"
+                            class="h-full w-full object-cover">
+                        <div *ngIf="!member.profilePicture" class="h-full w-full bg-indigo-100 flex items-center justify-center">
+                            <span class="text-indigo-600 font-medium">{{member.firstName[0]}}{{member.lastName[0]}}</span>
+                        </div>
+                    </div>
+                  <div>
+                    <div class="flex items-center space-x-2">
+                      <h4 class="font-medium text-gray-900">{{member.firstName}} {{member.lastName}}</h4>
+                      <span [class]="getRoleBadgeClass(member.role)">
+                        {{getRoleName(member.role)}}
+                      </span>
+                    </div>
+                    <div class="flex items-center space-x-4 mt-1 text-sm text-gray-500">
+                      <span>
+                        <i class="fas mr-1" [class]="getRoleIcon(member.role)"></i>
+                        Joined {{formatDate(member.joinedAt)}}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+  
+                <div class="flex items-center space-x-2" *ngIf="canManageTeam">
+                  <button (click)="onEditMemberRole(member)" 
+                          class="p-2 text-gray-400 hover:text-indigo-600 rounded-lg">
+                    <i class="fas fa-user-cog"></i>
+                  </button>
+                  <button (click)="onRemoveMember(member)"
+                          class="p-2 text-gray-400 hover:text-red-600 rounded-lg">
+                    <i class="fas fa-user-minus"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Communication Hub -->
+      <div class="space-y-6">
+        <!-- Chat Rooms Section -->
+        <div class="bg-white rounded-lg border">
+          <div class="p-4 border-b flex justify-between items-center">
+            <div>
+              <h3 class="text-lg font-semibold">Team Chat Rooms</h3>
+              <p class="text-sm text-gray-500">Communication channels</p>
+            </div>
+            <button *ngIf="canManageTeam" 
+                    (click)="onCreateChatRoom()"
+                    class="p-2 text-gray-400 hover:text-indigo-600 rounded-lg">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+  
+          <div class="p-4 space-y-3">
+            <div *ngFor="let room of project.chatRooms" 
+                 class="group cursor-pointer"
+                 (click)="onOpenChat(room)">
+              <div class="p-3 rounded-lg border hover:border-indigo-200 hover:bg-indigo-50 transition-all">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-indigo-100 rounded-lg">
+                      <div class="room-avatar">
+                        {{room.name.charAt(0).toUpperCase()}}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 class="font-medium group-hover:text-indigo-600">{{room.name}}</h4>
+                      <!-- <p class="text-sm text-gray-500">
+                        {{room.messageCount || 0}} messages
+                      </p> -->
+                    </div>
+                  </div>
+                  <i class="fas fa-chevron-right text-gray-300 group-hover:text-indigo-400"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Role Distribution -->
+        <div class="bg-white rounded-lg border p-4">
+          <h3 class="text-lg font-semibold mb-3">Role Distribution</h3>
+          <div class="space-y-3">
+            <div *ngFor="let role of roleDistribution" 
+                 class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center space-x-2">
+                <i class="fas text-indigo-600" [class]="getRoleIcon(role.role)"></i>
+                <span [class]="getRoleBadgeClass(role.role)">{{getRoleName(role.role)}}</span>
+              </div>
+              <span class="text-sm font-medium">
+                {{role.count}} ({{role.percentage | number:'1.0-0'}}%)
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div *ngIf="isAddMemberDialogOpen" 
+class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<div class="bg-white rounded-xl w-full max-w-2xl shadow-2xl">
+<!-- Dialog Header -->
+<div class="px-8 py-6 border-b">
+ <div class="flex items-center justify-between">
+   <div class="flex items-center gap-3">
+     <div class="p-2 bg-indigo-100 rounded-lg">
+       <i class="fas fa-user-plus text-indigo-600"></i>
+     </div>
+     <div>
+       <h2 class="text-2xl font-bold text-gray-800">Add Team Member</h2>
+       <p class="text-sm text-gray-600">Add a new member to the project team</p>
+     </div>
+   </div>
+   <button (click)="closeAddMemberDialog()" class="text-gray-400 hover:text-gray-600 transition-colors">
+     <i class="fa fa-times text-xl"></i>
+   </button>
+ </div>
+</div>
+
+<!-- Dialog Content -->
+<form [formGroup]="memberForm" (ngSubmit)="onSubmitMember()" class="px-8 py-6">
+ <div class="space-y-8">
+   <!-- User Search -->
+   <div class="space-y-2 relative">
+     <label class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+       Search User
+    <span class="text-red-500">*</span>
+    </label>
+    <input type="text" #searchInput [value]="selectedUser?.displayName || ''" (input)="onSearchInput($event)"
+        placeholder="Search by name or email..."
+        class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors">
+     
+     <!-- Loading indicator -->
+     <div *ngIf="isSearching" class="absolute right-3 top-1/2 -translate-y-1/2">
+       <i class="fas fa-spinner fa-spin text-gray-400"></i>
+     </div>
+
+     <!-- Search Results Dropdown -->
+     <div *ngIf="searchResults.length > 0" 
+          class="absolute mt-1 w-full bg-white border rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+       <div *ngFor="let user of searchResults"
+            (click)="onUserSelect(user)"
+            class="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3">
+         <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+            <div class="h-10 w-10 rounded-full overflow-hidden">
+                <img *ngIf="user.profilePicture" [src]="this.authService.getProfilePictureUrlForAnyUser(user.profilePicture)" [alt]="user.firstName + ' ' + user.lastName"
+                    class="h-full w-full object-cover">
+                <div *ngIf="!user.profilePicture" class="h-full w-full bg-indigo-100 flex items-center justify-center">
+                    <span class="text-indigo-600 font-medium">{{user.firstName[0]}}{{user.lastName[0]}}</span>
+                </div>
+            </div>
+         </div>
+         <div>
+           <div class="font-medium">{{user.displayName}}</div>
+           <div class="text-sm text-gray-500">{{user.email}}</div>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- Role Selection -->
+   <div class="space-y-2">
+     <label class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+       Role
+       <span class="text-red-500">*</span>
+     </label>
+     <select
+       formControlName="role"
+       class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors">
+       <option [value]="ProjectRole.Member">Member</option>
+       <option [value]="ProjectRole.Manager">Manager</option>
+       <option [value]="ProjectRole.Viewer">Viewer</option>
+     </select>
+   </div>
+ </div>
+
+ <!-- Dialog Footer -->
+ <div class="flex justify-end gap-4 mt-8 pt-6 border-t">
+   <button
+     type="button"
+     (click)="closeAddMemberDialog()"
+     class="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+     Cancel
+   </button>
+   <button
+     type="submit"
+     [disabled]="!memberForm.valid || !selectedUser" style="background-color: #667eea;"
+     class="px-6 py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
+     Add Member
+   </button>
+ </div>
+</form>
+</div>
+</div>
+
+
+<!-- Edit Role Modal -->
+<div *ngIf="isEditRoleDialogOpen" 
+     class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl w-full max-w-lg shadow-2xl">
+    <!-- Dialog Header -->
+    <div class="px-8 py-6 border-b">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-indigo-100 rounded-lg">
+            <i class="fas fa-user-cog text-indigo-600"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800">Update Member Role</h2>
+            <p class="text-sm text-gray-600">Change role for {{memberToEdit?.firstName}} {{memberToEdit?.lastName}}</p>
+          </div>
+        </div>
+        <button (click)="closeEditRoleDialog()" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Dialog Content -->
+    <form [formGroup]="editRoleForm" (ngSubmit)="onSubmitRoleEdit()" class="px-8 py-6">
+      <div class="space-y-6">
+        <!-- Role Selection -->
+        <div class="space-y-2">
+          <label class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+            Role
+            <span class="text-red-500">*</span>
+          </label>
+          <select
+            formControlName="role"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors">
+            <option [value]="ProjectRole.Admin">Admin</option>
+            <option [value]="ProjectRole.Manager">Manager</option>
+            <option [value]="ProjectRole.Member">Member</option>
+            <option [value]="ProjectRole.Viewer">Viewer</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dialog Footer -->
+      <div class="flex justify-end gap-4 mt-8 pt-6 border-t">
+        <button
+          type="button"
+          (click)="closeEditRoleDialog()"
+          class="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="!editRoleForm.valid" 
+          style="background-color: #667eea;"
+          class="px-6 py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
+          Update Role
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- Add this at the end of your template -->
+<div *ngIf="isCreateChatRoomDialogOpen" 
+     class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl w-full max-w-lg shadow-2xl">
+    <!-- Dialog Header -->
+    <div class="px-8 py-6 border-b">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-indigo-100 rounded-lg">
+            <i class="fas fa-comments text-indigo-600"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800">Create Chat Room</h2>
+            <p class="text-sm text-gray-600">Add a new chat room to the project</p>
+          </div>
+        </div>
+        <button (click)="closeCreateChatRoomDialog()" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Dialog Content -->
+    <form [formGroup]="chatRoomForm" (ngSubmit)="onSubmitChatRoom()" class="px-8 py-6">
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+            Chat Room Name
+            <span class="text-red-500">*</span>
+          </label>
+          <input type="text"
+                 formControlName="name"
+                 placeholder="Enter chat room name..."
+                 class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors">
+          
+          <p *ngIf="chatRoomForm.get('name')?.touched && chatRoomForm.get('name')?.errors?.['required']" 
+             class="text-sm text-red-500 mt-1">
+            Chat room name is required
+          </p>
+          <p *ngIf="chatRoomForm.get('name')?.touched && chatRoomForm.get('name')?.errors?.['minlength']" 
+             class="text-sm text-red-500 mt-1">
+            Name must be at least 3 characters long
+          </p>
+        </div>
+      </div>
+
+      <!-- Dialog Footer -->
+      <div class="flex justify-end gap-4 mt-8 pt-6 border-t">
+        <button type="button"
+                (click)="closeCreateChatRoomDialog()"
+                class="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancel
+        </button>
+        <button type="submit"
+                [disabled]="chatRoomForm.invalid"
+                style="background-color: #667eea;"
+                class="px-6 py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
+          Create
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

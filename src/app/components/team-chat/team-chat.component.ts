@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ChatMessage } from 'src/app/models/ChatMessage';
 import { ChatRoom } from 'src/app/models/ChatRoom';
-import { LoaderService } from 'src/app/services/loader.service';
+import { LoaderService } from 'src/app/shared/loader/service/loader.service';
 
 @Component({
   selector: 'app-team-chat',

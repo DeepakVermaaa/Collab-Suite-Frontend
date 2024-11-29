@@ -1,13 +1,13 @@
 // create-project-dialog.component.ts
+import { trigger, transition, style, animate } from '@angular/animations';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LoaderService } from 'src/app/services/loader.service';
-import { ToastService } from 'src/app/services/toast.service';
-import { ProjectStatus } from '../../models/project.model';
-import { ProjectCreateDto } from '../../models/ProjectCreateDto';
-import { ProjectService } from '../../service/project.service';
-import { trigger, transition, style, animate } from '@angular/animations';
 import * as moment from 'moment';
+import { LoaderService } from 'src/app/shared/loader/service/loader.service';
+import { ToastService } from 'src/app/shared/toast/service/toast.service';
+import { ProjectStatus } from '../models/enums/enums';
+import { ProjectCreateDto } from '../models/ProjectCreateDto';
+import { ProjectService } from '../service/project.service';
 
 @Component({
   selector: 'app-create-project-dialog',
@@ -105,6 +105,7 @@ export class CreateProjectDialogComponent implements OnInit {
         error: (error: any) => {
           console.error('Error creating project:', error);
           this.toastService.showError('Failed to create project. Please try again.');
+          this.loaderService.hide();
         }
       });
     } else {

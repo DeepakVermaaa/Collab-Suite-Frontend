@@ -1,14 +1,6 @@
-// project.model.ts
+import { ProjectStatus } from "./enums/enums";
 import { ProjectMember } from "./projectMember";
-import { ProjectMilestone } from "./projectMilestone";
-
-export enum ProjectStatus {
-  Planning = 0,
-  Active = 1,
-  OnHold = 2,
-  Completed = 3,
-  Cancelled = 4
-}
+import { ProjectMilestoneDetail } from "./projectMilestone";
 
 export interface Project {
   id: number;
@@ -26,7 +18,7 @@ export interface Project {
     inProgress: number;
     overdue: number;
   };
-  milestones: ProjectMilestone[];
+  milestones: ProjectMilestoneDetail[];
   progress: number;
   isActive: boolean;
   startDate?: Date;

@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { User } from 'src/app/models/User';
 import { AuthService } from 'src/app/services/auth.service';
-import { LoaderService } from 'src/app/services/loader.service';
-import { ToastService } from 'src/app/services/toast.service';
+import { LoaderService } from 'src/app/shared/loader/service/loader.service';
+import { ToastService } from 'src/app/shared/toast/service/toast.service';
 
 @Component({
   selector: 'app-manage-profile',

@@ -1,11 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProjectService } from './service/project.service';
-import { LoaderService } from 'src/app/services/loader.service';
-import { ToastService } from 'src/app/services/toast.service';
-import { Project, ProjectStatus } from './models/project.model';
+import { LoaderService } from 'src/app/shared/loader/service/loader.service';
+import { ToastService } from 'src/app/shared/toast/service/toast.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { ProjectsResponse } from 'src/app/models/ProjectResponse';
+import { MilestoneStatus, ProjectRole, ProjectStatus } from './models/enums/enums';
+import { Project } from './models/project.model';
+import { AuthService } from 'src/app/services/auth.service';
+import { User } from 'src/app/models/User';
+import { ConfirmationService } from 'src/app/shared/confirmation-modal/confirmation-modal/service/confirmation.service';
 
 @Component({
   selector: 'app-project',
@@ -14,37 +18,43 @@ import { ProjectsResponse } from 'src/app/models/ProjectResponse';
 })
 export class ProjectComponent implements OnInit, OnDestroy {
   // Projects Data
-   // Projects Data
-   projects: Project[] = [];
-   totalCount: number = 0;
-   totalPages: number = 0;
- 
-   // Filters and Pagination
-   filterParams: any = {
-     searchQuery: '',
-     status: null,  // Changed from empty string to null
-     sortBy: 'created',
-     sortDirection: 'desc',
-     pageNumber: 1,
-     pageSize: 9
-   };
+  projects: Project[] = [];
+  totalCount: number = 0;
+  totalPages: number = 0;
+
+  // Filters and Pagination
+  filterParams: any = {
+    searchQuery: '',
+    status: null,
+    sortBy: 'created',
+    sortDirection: 'desc',
+    pageNumber: 1,
+    pageSize: 9
+  };
 
   // Loading State
   loading: boolean = false;
 
- //Subject and Subscription
+  //Subject and Subscription
   private searchSubject = new Subject<string>();
   private searchSubscription: any;
 
+  currentUser: User | null = null;
   showCreateDialog = false;
   ProjectStatus = ProjectStatus;
+  ProjectRole = ProjectRole;
 
   constructor(
     private projectService: ProjectService,
     private router: Router,
     private toastService: ToastService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private authService: AuthService,
+    private confirmationService: ConfirmationService
   ) {
+    // Get current user
+    this.currentUser = this.authService.getCurrentUser();
+
     // Setup search debounce
     this.searchSubscription = this.searchSubject.pipe(
       debounceTime(300),
@@ -133,7 +143,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   onSortChange() {
-    this.filterParams.sortDirection = 
+    this.filterParams.sortDirection =
       this.filterParams.sortDirection === 'asc' ? 'desc' : 'asc';
     this.loadProjects();
   }
@@ -148,14 +158,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
   getNextMilestone(project: Project) {
     if (!project.milestones?.length) return [];
     return project.milestones
-      .filter(m => m.status !== 'Completed' && new Date(m.dueDate) >= new Date())
+      .filter(m => m.status !== MilestoneStatus.Completed && new Date(m.dueDate) >= new Date())
       .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
       .slice(0, 1);
   }
 
-  // Navigation
+  //Navigation
   navigateToProject(projectId: number) {
-    this.router.navigate(['/projects', projectId]);
+    this.router.navigate(['/dashboard/projects', projectId]);
   }
 
   openCreateProjectDialog(): void {
@@ -168,5 +178,40 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   onProjectCreated(): void {
     this.loadProjects(); // Refresh the project list
+  }
+
+  isProjectAdmin(project: Project): boolean {
+    if (!this.currentUser) return false;
+
+    const userMember = project.members.find(m => m.userId === this.currentUser?.id);
+    return userMember?.role === ProjectRole.Admin;
+  }
+
+  async deleteProject(event: Event, projectId: number) {
+    event.stopPropagation();
+
+    const confirmed = await this.confirmationService.confirm({
+      title: 'Delete Project',
+      message: 'Are you sure you want to delete this project?',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      type: 'danger'
+    });
+
+    if (confirmed) {
+      this.loaderService.show();
+      this.projectService.deleteProject(projectId).subscribe({
+        next: () => {
+          this.toastService.showSuccess('Project deleted successfully');
+          this.loadProjects();
+          this.loaderService.hide();
+        },
+        error: (error) => {
+          console.error('Error deleting project:', error);
+          this.toastService.showError('Failed to delete project. Please try again.');
+          this.loaderService.hide();
+        }
+      });
+    }
   }
 }

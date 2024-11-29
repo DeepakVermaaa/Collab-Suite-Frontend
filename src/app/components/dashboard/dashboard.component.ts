@@ -41,6 +41,12 @@ export class DashboardComponent implements OnInit {
   }
 
   private updatePageTitle(url: string) {
+
+    const segments = url.split('/').filter(segment => segment);
+    if (segments.length >= 2 && segments[0] === 'dashboard' && segments[1] === 'projects' && segments.length === 3) {
+      this.pageTitle = 'Project Details';
+      return;
+    }
     // Extract the last segment of the URL
     const segment = url.split('/').pop();
     

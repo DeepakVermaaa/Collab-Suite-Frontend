@@ -1,20 +1,22 @@
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { LoaderComponent } from './components/loader/loader.component';
 import { LoginComponent } from './components/login/login.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { NotificationComponent } from './components/notification/notification.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { TeamChatComponent } from './components/team-chat/team-chat.component';
-import { ToastComponent } from './components/toast/toast.component';
 import { TokenInterceptor } from './interceptors/token.interceptor';
 import { ManageProfileComponent } from './components/manage-profile/manage-profile.component';
+import { ToastComponent } from './shared/toast/toast.component';
+import { LoaderComponent } from './shared/loader/loader.component';
+import { ConfirmationModalComponent } from './shared/confirmation-modal/confirmation-modal/confirmation-modal.component';
+import { ConfirmationContainerComponent } from './shared/confirmation-container/confirmation-container.component';
 
 @NgModule({
   declarations: [
@@ -27,10 +29,13 @@ import { ManageProfileComponent } from './components/manage-profile/manage-profi
     DashboardComponent,
     NotificationComponent,
     TeamChatComponent,
-    ManageProfileComponent
+    ManageProfileComponent,
+    ConfirmationModalComponent,
+    ConfirmationContainerComponent
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     BrowserAnimationsModule,
     AppRoutingModule,
     ReactiveFormsModule,

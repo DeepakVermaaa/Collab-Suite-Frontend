@@ -8,4 +8,5 @@ export interface User {
   profilePicture?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  organizationId?: number
 }

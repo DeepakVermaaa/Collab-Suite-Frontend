@@ -1,5 +1,5 @@
 import { Injectable, ComponentFactoryResolver, ApplicationRef, Injector, EmbeddedViewRef } from '@angular/core';
-import { ToastComponent } from '../components/toast/toast.component';
+import { ToastComponent } from '../toast.component';
 
 /**
  * Service responsible for dynamically creating and displaying toast notifications.

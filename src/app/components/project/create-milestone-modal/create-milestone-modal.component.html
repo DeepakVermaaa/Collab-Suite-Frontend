@@ -1,0 +1,132 @@
+<div *ngIf="show" 
+     @backdropAnimation 
+     class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div @dialogAnimation 
+         class="bg-white rounded-xl w-full max-w-2xl shadow-2xl">
+        <!-- Dialog Header -->
+        <div class="px-8 py-6 border-b">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-100 rounded-lg">
+                        <i class="fas fa-flag text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">{{isEditMode ? 'Edit Milestone' : 'Create New Milestone'}}</h2>
+                        <p class="text-sm text-gray-600">
+                            {{isEditMode ? 'Update milestone details' : 'Add a new milestone to track important project objectives and deadlines.'}}
+                        </p>
+                    </div>
+                </div>
+                <button (click)="close()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Dialog Content -->
+        <form [formGroup]="milestoneForm" (ngSubmit)="onSubmit()" class="px-8 py-6">
+            <div class="space-y-8">
+                <!-- Title -->
+                <div class="space-y-2">
+                    <label for="title" class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                        Title
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text"
+                           id="title"
+                           formControlName="title"
+                           [class.border-red-500]="milestoneForm.get('title')?.touched && milestoneForm.get('title')?.errors"
+                           class="w-full px-4 py-3 rounded-lg border bg-gray-50 focus:bg-white transition-colors"
+                           [ngClass]="{'border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200': 
+                                    !(milestoneForm.get('title')?.touched && milestoneForm.get('title')?.errors)}"
+                           placeholder="Enter milestone title">
+                    <p *ngIf="milestoneForm.get('title')?.touched && milestoneForm.get('title')?.errors?.['required']"
+                       class="text-sm text-red-500 mt-1">
+                        Title is required
+                    </p>
+                </div>
+
+                <!-- Description -->
+                <div class="space-y-2">
+                    <label for="description" class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                        Description
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="description"
+                              formControlName="description"
+                              rows="5"
+                              [class.border-red-500]="milestoneForm.get('description')?.touched && milestoneForm.get('description')?.errors"
+                              class="w-full px-4 py-3 rounded-lg border bg-gray-50 focus:bg-white transition-colors resize-none"
+                              [ngClass]="{'border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200': 
+                                       !(milestoneForm.get('description')?.touched && milestoneForm.get('description')?.errors)}"
+                              placeholder="Enter milestone description"></textarea>
+                    <p *ngIf="milestoneForm.get('description')?.touched && milestoneForm.get('description')?.errors?.['maxlength']"
+                       class="text-sm text-red-500 mt-1">
+                        Description must be less than 500 characters
+                    </p>
+                </div>
+
+                <!-- Due Date -->
+                <div class="space-y-2">
+                    <label for="dueDate" class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                        Due Date
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date"
+                           id="dueDate"
+                           formControlName="dueDate"
+                           [min]="getMinDate()"
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors">
+                    <p *ngIf="milestoneForm.get('dueDate')?.touched && milestoneForm.get('dueDate')?.errors?.['required']"
+                       class="text-sm text-red-500 mt-1">
+                        Due date is required
+                    </p>
+                    <p *ngIf="milestoneForm.get('dueDate')?.value && isPastDate(milestoneForm.get('dueDate')?.value)"
+                       class="text-sm text-orange-500 mt-1 flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Selected date is in the past
+                    </p>
+                </div>
+
+                <!-- Status (Only show in edit mode) -->
+                <div class="space-y-2" *ngIf="isEditMode">
+                    <label for="status" class="text-sm font-semibold text-gray-700">
+                        Status
+                    </label>
+                    <select id="status"
+                            formControlName="status"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors">
+                        <option [ngValue]="MilestoneStatus.Pending">Pending</option>
+                        <option [ngValue]="MilestoneStatus.InProgress">In Progress</option>
+                        <option [ngValue]="MilestoneStatus.Completed">Completed</option>
+                        <option [ngValue]="MilestoneStatus.Delayed">Delayed</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Dialog Footer -->
+            <div class="flex justify-end gap-4 mt-8 pt-6 border-t">
+                <button type="button"
+                        (click)="close()"
+                        class="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit"
+                        [disabled]="!milestoneForm.valid || isSubmitting"
+                        style="background-color: #667eea;"
+                        class="px-6 py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    <span *ngIf="!isSubmitting">
+                        {{isEditMode ? 'Save Changes' : 'Create Milestone'}}
+                    </span>
+                    <span *ngIf="isSubmitting" class="flex items-center gap-2">
+                        <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{isEditMode ? 'Saving...' : 'Creating...'}}
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

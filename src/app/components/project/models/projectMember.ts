@@ -1,7 +1,9 @@
+import { ProjectRole } from "./enums/enums";
+
 export interface ProjectMember {
     userId: number;
     firstName: string;
     lastName: string;
-    role: 'Admin' | 'Manager' | 'Member' | 'Viewer';
+    role: ProjectRole;
     joinedAt: Date;
   }

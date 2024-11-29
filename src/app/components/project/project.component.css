@@ -11,6 +11,15 @@
   margin-bottom: 1.5rem;
 }
 
+.fa-trash-alt {
+  cursor: pointer;
+  padding: 4px;
+}
+
+.fa-trash-alt:hover {
+  opacity: 0.8;
+}
+
 .header-content {
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #eaecf0;

@@ -1,0 +1,16 @@
+<div class="grid grid-cols-3 gap-6">
+    <!-- Status Distribution Chart -->
+    <div class="space-y-4">
+      <div class="h-[300px] w-full" echarts [options]="statusChartOption"></div>
+    </div>
+  
+    <!-- Completion Rate Chart -->
+    <div class="space-y-4">
+      <div class="h-[300px] w-full" echarts [options]="completionChartOption"></div>
+    </div>
+  
+    <!-- Priority Distribution Chart -->
+    <div class="space-y-4">
+      <div class="h-[300px] w-full" echarts [options]="priorityChartOption"></div>
+    </div>
+  </div>

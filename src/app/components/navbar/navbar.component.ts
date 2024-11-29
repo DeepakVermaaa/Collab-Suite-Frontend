@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { ToastService } from 'src/app/services/toast.service';
+import { ToastService } from 'src/app/shared/toast/service/toast.service';
 import { User } from 'src/app/models/User';
 
 @Component({
