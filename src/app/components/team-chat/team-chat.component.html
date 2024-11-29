@@ -1,36 +1,64 @@
 <div class="chat-wrapper">
   <!-- Sidebar -->
   <div class="chat-sidebar">
+    <!-- Project Filter Dropdown -->
+    <div class="project-filter">
+      <!-- In template -->
+      <select class="project-select" (change)="handleProjectChange($event)">
+        <option [value]="null">All Projects</option>
+        <option *ngFor="let project of userProjects" [value]="project.id">
+          {{project.name}}
+        </option>
+      </select>
+    </div>
+
+    <!-- Search Box -->
     <div class="search-header">
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" placeholder="Search chats...">
+        <input type="text" placeholder="Search chats..." [ngModel]="searchTerm"
+          (ngModelChange)="searchChatRooms($event)">
       </div>
     </div>
 
     <div class="chat-list">
       <div class="chat-list-header">
         <h3>Project Chats</h3>
-        <span class="chat-count">{{chatRooms?.length || 0}}</span>
+        <span class="chat-count">{{filteredChatRooms?.length || 0}}</span>
       </div>
 
       <div class="chat-rooms">
-        <div *ngFor="let room of chatRooms" class="chat-room" [class.active]="selectedRoom?.id === room.id"
-          (click)="selectRoom(room)">
-          <div class="room-avatar">
-            {{room?.name?.charAt(0)?.toUpperCase()}}
-          </div>
-          <div class="room-info">
-            <div class="room-name-row">
-              <h4>{{room.name}}</h4>
-              <span class="time">{{room.createdAt | date:'shortTime'}}</span>
+        <!-- Show rooms if they exist -->
+        <ng-container *ngIf="filteredChatRooms && filteredChatRooms.length > 0; else noRooms">
+          <div *ngFor="let room of filteredChatRooms" class="chat-room" [class.active]="selectedRoom?.id === room.id"
+            (click)="selectRoom(room)">
+            <div class="room-avatar">
+              {{room?.name?.charAt(0)?.toUpperCase()}}
             </div>
-            <div class="room-preview">
-              <span class="project">{{room.projectGroup?.name}}</span>
-              <span class="member-count">{{onlineUsers.length}} online</span>
+            <div class="room-info">
+              <div class="room-name-row">
+                <h4>{{room.name}}</h4>
+                <span class="time">{{room.createdAt | date:'shortTime'}}</span>
+              </div>
+              <div class="room-preview">
+                <span class="project">{{room.projectGroup?.name}}</span>
+                <span class="member-count">{{onlineUsers.length}} online</span>
+              </div>
             </div>
           </div>
-        </div>
+        </ng-container>
+
+        <!-- No rooms message -->
+        <ng-template #noRooms>
+          <div class="no-rooms-message">
+            <div class="empty-icon">
+              <i class="fas fa-comments"></i>
+            </div>
+            <p *ngIf="selectedProjectId">No chat rooms found in this project</p>
+            <p *ngIf="searchTerm && !selectedProjectId">No chat rooms match your search</p>
+            <p *ngIf="!searchTerm && !selectedProjectId">No chat rooms available</p>
+          </div>
+        </ng-template>
       </div>
     </div>
   </div>

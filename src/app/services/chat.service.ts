@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { ChatMessage } from '../models/ChatMessage';
 import { ChatRoom } from '../models/ChatRoom';
 import { environment } from 'environment';
+import { ProjectDropdownDto } from '../components/team-chat/models/ProjectDropdownDto';
 
 @Injectable({
   providedIn: 'root'
@@ -89,8 +90,26 @@ export class ChatService {
     }
   }
 
-  public getChatRooms(): Observable<ChatRoom[]> {
-    return this.http.get<ChatRoom[]>(`${this.apiUrl}/api/Chat/rooms`);
+  public getChatRooms(projectId?: number | null): Observable<ChatRoom[]> {
+    let url = `${this.apiUrl}/api/Chat/rooms`;
+    if (projectId) {
+        url += `?projectId=${projectId}`;
+    }
+    return this.http.get<ChatRoom[]>(url);
+}
+
+  public searchChatRooms(searchTerm: string, projectId?: number): Observable<ChatRoom[]> {
+    return this.getChatRooms(projectId).pipe(
+      map(rooms => rooms.filter(room => 
+        room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        room.projectGroup?.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ))
+    );
+
+  }
+
+  public getUserProjects() {
+    return this.http.get<ProjectDropdownDto[]>(`${this.apiUrl}/api/Chat/projects`);
   }
 
   public getMessageHistory(projectGroupId: number, limit?: number): Observable<ChatMessage[]> {

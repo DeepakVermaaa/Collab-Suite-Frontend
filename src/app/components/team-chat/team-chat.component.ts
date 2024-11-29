@@ -6,6 +6,10 @@ import { takeUntil } from 'rxjs/operators';
 import { ChatMessage } from 'src/app/models/ChatMessage';
 import { ChatRoom } from 'src/app/models/ChatRoom';
 import { LoaderService } from 'src/app/shared/loader/service/loader.service';
+import { ProjectGroup } from 'src/app/models/ProjectGroup';
+import { ProjectService } from '../project/service/project.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { ProjectDropdownDto } from './models/ProjectDropdownDto';
 
 @Component({
   selector: 'app-team-chat',
@@ -16,31 +20,37 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   chatRooms: ChatRoom[] | undefined = [];
+  filteredChatRooms: ChatRoom[] | undefined = [];
   selectedRoom: ChatRoom | null = null;
   messages: ChatMessage[] = [];
+  userProjects: ProjectDropdownDto[] = [];
+  selectedProjectId: number | null = null;
+  searchTerm: string = '';
   onlineUsers: string[] = [];
-  currentUserId: number;
+  currentUserId: number | null;
   messageForm: FormGroup;
   isLoading = false;
   error: string | null = null;
-  
+
   private destroy$ = new Subject<void>();
   private shouldScrollToBottom = false;
 
   constructor(
     private chatService: ChatService,
     private fb: FormBuilder,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private projectService: ProjectService,
+    private authService: AuthService
   ) {
-    const userString = localStorage.getItem('user') || '';
-    const user = userString ? JSON.parse(userString) : null;
-    this.currentUserId = user ? user.id : null;
+    const currentUser = this.authService.getCurrentUser();
+    this.currentUserId = currentUser?.id || null;
     this.messageForm = this.fb.group({
       message: ['', [Validators.required, Validators.maxLength(1000)]]
     });
   }
 
   ngOnInit() {
+    this.loadUserProjects();
     this.initializeChat();
   }
 
@@ -51,6 +61,54 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
+  private async loadUserProjects() {
+    try {
+      const projects = await this.chatService.getUserProjects().toPromise();
+      this.userProjects = projects || [];
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      this.error = 'Failed to load projects';
+      this.userProjects = [];
+    }
+  }
+
+  async filterByProject(projectId: number | null) {
+    try {
+      this.isLoading = true;
+      this.loaderService.show();
+      this.selectedProjectId = projectId;
+      this.chatRooms = await this.chatService.getChatRooms(projectId).toPromise();
+      this.applySearch();
+    } catch (error) {
+      console.error('Error filtering chat rooms:', error);
+      this.error = 'Failed to filter chat rooms';
+    } finally {
+      this.isLoading = false;
+      this.loaderService.hide();
+    }
+  }
+
+  async searchChatRooms(searchTerm: string) {
+    this.searchTerm = searchTerm;
+    this.applySearch();
+  }
+
+  private applySearch() {
+    if (!this.chatRooms) {
+      this.filteredChatRooms = [];
+      return;
+    }
+
+    if (!this.searchTerm) {
+      this.filteredChatRooms = this.chatRooms;
+      return;
+    }
+
+    this.filteredChatRooms = this.chatRooms.filter(room =>
+      room.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      room.projectGroup?.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
 
   private async initializeChat() {
     try {
@@ -70,15 +128,24 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   private async loadChatRooms() {
     try {
-      this.chatRooms = await this.chatService.getChatRooms().toPromise();
+      const rooms = await this.chatService.getChatRooms().toPromise();
+      this.chatRooms = rooms || [];
+      this.filteredChatRooms = this.chatRooms;
       console.log(this.chatRooms);
     } catch (error) {
       console.error('Error loading chat rooms:', error);
       this.error = 'Failed to load chat rooms';
+      this.chatRooms = [];
+      this.filteredChatRooms = [];
       throw error;
     }
   }
 
+  handleProjectChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const value = select.value ? +select.value : null;
+    this.filterByProject(value);
+  }
   private subscribeToEvents() {
     this.chatService.messages$
       .pipe(takeUntil(this.destroy$))
@@ -143,7 +210,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   async deleteMessage(messageId: number) {
     try {
       this.isLoading = true;
-      this.loaderService.show();
+      // this.loaderService.show();
       await this.chatService.deleteMessage(messageId).toPromise();
       this.messages = this.messages.filter(m => m.id !== messageId);
       this.error = null;
@@ -152,7 +219,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.error = 'Failed to delete message';
     } finally {
       this.isLoading = false;
-      this.loaderService.hide();
+      // this.loaderService.hide();
     }
   }
 
@@ -175,7 +242,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     const today = new Date();
     return today.toLocaleDateString('en-US', {
       weekday: 'long',
-      year: 'numeric', 
+      year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
