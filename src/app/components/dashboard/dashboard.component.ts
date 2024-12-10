@@ -47,6 +47,18 @@ export class DashboardComponent implements OnInit {
       this.pageTitle = 'Project Details';
       return;
     }
+
+    if (url.includes('/tasks/')) {
+      if (url.includes('/tasks/create')) {
+        this.pageTitle = 'Create Task';
+        return;
+      }
+      if (url.includes('/tasks/edit')) {
+        this.pageTitle = 'Task';
+        return;
+      }
+    }
+    
     // Extract the last segment of the URL
     const segment = url.split('/').pop();
     
@@ -58,7 +70,13 @@ export class DashboardComponent implements OnInit {
         this.pageTitle = 'Projects';
         break;
       case 'tasks':
-        this.pageTitle = 'Tasks';
+        this.pageTitle = 'Task Board';
+        break;
+      case 'tasks/create/:id':
+        this.pageTitle = 'Create Task';
+        break;
+        case 'tasks/create':
+        this.pageTitle = 'Create Task';
         break;
       case 'documents':
         this.pageTitle = 'Documents';

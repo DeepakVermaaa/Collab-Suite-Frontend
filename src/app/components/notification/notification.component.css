@@ -1,5 +1,6 @@
 .notification-wrapper {
     position: relative;
+    z-index: 10000;
 }
 
 /* Bell Icon Button */

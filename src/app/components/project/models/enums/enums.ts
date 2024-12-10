@@ -62,23 +62,27 @@ export const getTaskPriorityInfo = (priority: TaskPriority) => {
         [TaskPriority.Low]: {
             text: 'Low',
             classes: 'bg-gray-100 text-gray-800',
-            icon: 'arrow-down'
+            icon: 'arrow_downward'
         },
         [TaskPriority.Medium]: {
             text: 'Medium',
             classes: 'bg-blue-100 text-blue-800',
-            icon: 'minus'
+            icon: 'remove'
         },
         [TaskPriority.High]: {
             text: 'High',
             classes: 'bg-orange-100 text-orange-800',
-            icon: 'arrow-up'
+            icon: 'arrow_upward'
         },
         [TaskPriority.Urgent]: {
             text: 'Urgent',
             classes: 'bg-red-100 text-red-800',
-            icon: 'alert-triangle'
+            icon: 'priority_high'
         }
     };
-    return priorityMap[priority] || { text: 'Unknown', classes: 'bg-gray-100 text-gray-800', icon: 'help-circle' };
+    return priorityMap[priority] || { 
+        text: 'Unknown', 
+        classes: 'bg-gray-100 text-gray-800', 
+        icon: 'help_outline' 
+    };
 };

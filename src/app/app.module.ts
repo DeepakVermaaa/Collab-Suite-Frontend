@@ -17,6 +17,7 @@ import { ToastComponent } from './shared/toast/toast.component';
 import { LoaderComponent } from './shared/loader/loader.component';
 import { ConfirmationModalComponent } from './shared/confirmation-modal/confirmation-modal/confirmation-modal.component';
 import { ConfirmationContainerComponent } from './shared/confirmation-container/confirmation-container.component';
+import { TaskComponent } from './components/task/task.component';
 
 @NgModule({
   declarations: [

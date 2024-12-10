@@ -19,4 +19,12 @@ export class UserService {
 
     return this.http.get<UserSearchResult[]>(`${this.apiUrl}/search`, { params });
   }
+
+  searchProjectAssignees(searchTerm: string, projectId: number): Observable<UserSearchResult[]> {
+    const params = new HttpParams()
+      .set('searchTerm', searchTerm)
+      .set('projectId', projectId.toString());
+
+    return this.http.get<UserSearchResult[]>(`${this.apiUrl}/search-project-assignees`, { params });
+  }
 }
