@@ -37,7 +37,15 @@ const routes: Routes = [
       { 
         path: 'tasks',
         loadChildren: () => import('./components/task/task.module').then(m => m.TaskModule)
-      }
+      },
+      { 
+        path: 'documents',
+        loadChildren: () => import('./components//document-management/document-management.module').then(m => m.DocumentManagementModule)
+      },
+      { 
+        path: 'analytics',
+        loadChildren: () => import('./components/analytics/analytics.module').then(m => m.AnalyticsModule)
+      },
     ]
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' },

@@ -1,0 +1,83 @@
+<!-- analytics.component.html -->
+<div class="analytics-container">
+    <div class="top-actions">
+        <button mat-button class="refresh-button" (click)="refreshData()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="dashboard-content">
+        <!-- Overview Cards -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="card-content">
+                    <div class="text-section">
+                        <h2>Projects</h2>
+                        <div class="metric-value">{{ overviewData.totalProjects }}</div>
+                        <div class="metric-label">Total Projects</div>
+                    </div>
+                    <div class="progress-chart">
+                        <div echarts [options]="projectProgressOption"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In your analytics.component.html -->
+            <!-- In analytics.component.html -->
+            <div class="metric-card">
+                <h2>Tasks</h2>
+                <div class="metric-value">{{ overviewData.totalTasks }}</div>
+                <div class="metric-label">Total Tasks</div>
+                <div class="task-metrics">
+                    <div class="metrics-row">
+                        <div class="metric-item">
+                            <span class="metric-title">Active</span>
+                            <span class="metric-value">{{ overviewData.totalTasks - overviewData.completedTasks
+                                }}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-title">Completed</span>
+                            <span class="metric-value">{{ overviewData.completedTasks }}</span>
+                        </div>
+                    </div>
+                    <div class="completion-section">
+                        <div class="completion-header">
+                            <span class="completion-label">Completion Rate</span>
+                            <span class="completion-value" [ngClass]="{'low': overviewData.taskCompletionRate < 30}">
+                                {{ Math.round(overviewData.taskCompletionRate) }}%
+                                <mat-icon class="trend-icon">trending_down</mat-icon>
+                            </span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" [style.width.%]="overviewData.taskCompletionRate"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h2>Task Status Distribution</h2>
+                <div echarts [options]="taskStatusOption" class="chart-container"></div>
+            </div>
+
+            <div class="chart-card">
+                <h2>Task Priority Distribution</h2>
+                <div echarts [options]="taskPriorityOption" class="chart-container"></div>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h2>Team Performance</h2>
+            <div echarts [options]="teamPerformanceOption" class="chart-container"></div>
+        </div>
+    </div>
+</div>

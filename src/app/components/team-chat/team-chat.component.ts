@@ -170,7 +170,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
           await this.chatService.leaveGroup(this.selectedRoom.id);
         }
         this.selectedRoom = room;
-        await this.chatService.joinGroup(room.id);
+        await this.chatService.joinGroup(room.projectGroupId);
         // Clear any previous errors when successfully joining a room
         this.error = null;
       } catch (error) {
@@ -196,7 +196,7 @@ export class TeamChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     try {
       this.isLoading = true;
-      await this.chatService.sendMessage(this.selectedRoom.id, content);
+      await this.chatService.sendMessage(this.selectedRoom.projectGroupId, content);
       this.messageForm.reset();
       this.error = null;
     } catch (error) {

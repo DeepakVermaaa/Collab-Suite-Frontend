@@ -1,0 +1,138 @@
+<div class="h-full flex flex-col bg-white">
+    <div class="border-b bg-gray-50 px-4">
+        <div class="flex items-center justify-between">
+            <!-- Sheet Navigation -->
+            <div class="flex items-center space-x-1 overflow-x-auto py-2">
+                <button *ngFor="let sheet of sheets; let i = index" (click)="switchSheet(sheet.name)"
+                    class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-all"
+                    [class.bg-white]="activeSheet === sheet.name" [class.shadow-sm]="activeSheet === sheet.name"
+                    [class.text-indigo-600]="activeSheet === sheet.name" [class.border]="activeSheet === sheet.name"
+                    [class.border-indigo-200]="activeSheet === sheet.name"
+                    [class.text-gray-600]="activeSheet !== sheet.name"
+                    [class.hover:bg-gray-100]="activeSheet !== sheet.name">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-table text-xs"></i>
+                        {{sheet.name}}
+                        <span class="text-xs text-gray-400">({{sheet.totalRows}} rows)</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="flex items-center gap-2">
+                <div class="relative">
+                    <button (click)="toggleSearch()"
+                        class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-white rounded-lg transition-colors"
+                        [class.bg-white]="showSearchInput" [class.text-indigo-600]="showSearchInput">
+                        <i class="fas fa-search"></i>
+                    </button>
+
+                    <!-- Search Input Dropdown -->
+                    <div *ngIf="showSearchInput"
+                        class="absolute right-0 top-full mt-1 w-64 bg-white rounded-lg shadow-lg border p-2 z-10">
+                        <div class="relative">
+                            <input type="text" [(ngModel)]="searchTerm" (input)="onSearch($event)"
+                                placeholder="Search in sheet..."
+                                class="w-full pl-8 pr-8 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <i class="fas fa-search absolute left-2 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <button *ngIf="searchTerm" (click)="clearSearch()"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div *ngIf="searchTerm" class="text-xs text-gray-500 mt-2">
+                            Found {{ (searchResults$ | async) || 0 }} matches
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Content -->
+    <div *ngIf="!isLoading && !error" class="flex-1 overflow-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th *ngFor="let header of getCurrentSheet()?.headers"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 bg-gray-50 first:pl-6 border-b">
+                        <div class="flex items-center gap-2">
+                            {{header}}
+                            <button class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-sort text-gray-400 hover:text-gray-600"></i>
+                            </button>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let row of getVisibleData()" class="hover:bg-gray-50 transition-colors">
+                    <td *ngFor="let cell of row" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 first:pl-6">
+                        {{formatCellValue(cell)}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- Enhanced loading state -->
+    <div *ngIf="isLoading" class="flex-1 flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+            <p class="text-gray-600 font-medium">Loading Excel file...</p>
+            <p class="text-sm text-gray-500">This may take a moment</p>
+        </div>
+    </div>
+
+    <!-- Enhanced error state -->
+    <div *ngIf="error" class="flex-1 flex items-center justify-center">
+        <div class="text-center max-w-md mx-auto p-6 bg-red-50 rounded-xl">
+            <i class="fas fa-exclamation-circle text-3xl text-red-500 mb-4"></i>
+            <p class="text-red-600 font-medium mb-2">{{error}}</p>
+            <p class="text-sm text-red-500">Please try again or contact support if the issue persists</p>
+            <button class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                Retry
+            </button>
+        </div>
+    </div>
+
+    <!-- Enhanced empty state -->
+    <div *ngIf="!isLoading && !error && (!getCurrentSheet()?.data || getCurrentSheet()?.data?.length === 0)"
+        class="flex-1 flex items-center justify-center">
+        <div class="text-center max-w-md mx-auto">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-table text-2xl text-gray-400"></i>
+            </div>
+            <p class="text-gray-600 font-medium mb-2">No data available</p>
+            <p class="text-sm text-gray-500">This sheet appears to be empty</p>
+        </div>
+    </div>
+
+    <!-- Footer with stats -->
+    <div *ngIf="!isLoading && !error && getCurrentSheet()?.data?.length"
+        class="border-t bg-white px-6 py-3 flex justify-between items-center text-sm text-gray-500">
+        <!-- Stats -->
+        <div class="flex items-center gap-4">
+            <span>{{getSheetStats()}}</span>
+            <span *ngIf="searchTerm" class="text-indigo-600">
+                ({{searchResults$ | async}} matches)
+            </span>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <button (click)="previousPage()" [disabled]="!canGoPrevious()"
+                    class="p-2 text-gray-500 hover:text-indigo-600 disabled:text-gray-300 disabled:hover:text-gray-300 transition-colors">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span>Page {{currentPage}} of {{totalPages}}</span>
+                <button (click)="nextPage()" [disabled]="!canGoNext()"
+                    class="p-2 text-gray-500 hover:text-indigo-600 disabled:text-gray-300 disabled:hover:text-gray-300 transition-colors">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

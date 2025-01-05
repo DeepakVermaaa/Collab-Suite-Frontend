@@ -1,3 +1,4 @@
+import { DocumentModel } from "../../document-management/models/document.models";
 import { ProjectStatus } from "./enums/enums";
 import { ProjectMember } from "./projectMember";
 import { ProjectMilestoneDetail } from "./projectMilestone";
@@ -19,6 +20,7 @@ export interface Project {
     overdue: number;
   };
   milestones: ProjectMilestoneDetail[];
+  documents?: DocumentModel[];
   progress: number;
   isActive: boolean;
   startDate?: Date;

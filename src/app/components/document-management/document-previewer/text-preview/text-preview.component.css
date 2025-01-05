@@ -1,0 +1,8 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+.text-content {
+    tab-size: 4;
+}

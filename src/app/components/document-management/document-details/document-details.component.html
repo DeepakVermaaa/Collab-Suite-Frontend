@@ -1,0 +1,422 @@
+<!-- document-details.component.html -->
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl w-full max-w-7xl shadow-2xl max-h-[90vh] min-h-[80vh] flex flex-col my-8">
+        <!-- Enhanced Header with Document Preview Badge -->
+        <div class="px-8 py-6 border-b">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="p-4 rounded-xl" [ngClass]="{
+                            'bg-blue-100': document.fileExtension === '.pdf',
+                            'bg-red-100': document.fileExtension === '.doc' || document.fileExtension === '.docx',
+                            'bg-green-100': document.fileExtension === '.xls' || document.fileExtension === '.xlsx',
+                            'bg-purple-100': document.fileExtension === '.txt'
+                        }">
+                            <i class="fas fa-2xl" [ngClass]="{
+                                'fa-file-pdf text-blue-600': document.fileExtension === '.pdf',
+                                'fa-file-word text-red-600': document.fileExtension === '.doc' || document.fileExtension === '.docx',
+                                'fa-file-excel text-green-600': document.fileExtension === '.xls' || document.fileExtension === '.xlsx',
+                                'fa-file-alt text-purple-600': document.fileExtension === '.txt'
+                            }"></i>
+                        </div>
+                        <span
+                            class="absolute -bottom-1 -right-1 px-2 py-1 bg-indigo-600 text-white text-xs rounded-full">
+                            v{{document.latestVersion}}
+                        </span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-2xl font-bold text-gray-800">{{document.name}}</h2>
+                            <span class="text-sm px-2 py-1 bg-gray-100 rounded-full text-gray-600 font-medium">
+                                {{document.fileExtension.toUpperCase().replace('.', '')}}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1 text-sm text-gray-500">
+                            <span>{{formatFileSize(document.fileSize)}}</span>
+                            <span>•</span>
+                            <div class="flex items-center gap-2">
+                                <img [src]="authService.getProfilePictureUrl(document.uploadedBy.profilePicture)"
+                                    [alt]="document.uploadedBy.firstName" class="w-5 h-5 rounded-full">
+                                <span>{{document.uploadedBy.firstName}} {{document.uploadedBy.lastName}}</span>
+                            </div>
+                            <span>•</span>
+                            <span>{{formatDate(document.uploadedAt)}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button *ngIf="canDownload()" (click)="openDocumentViewer()"
+                        class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center gap-2 transition-colors">
+                        <i class="fas fa-eye"></i>
+                        View
+                    </button>
+                    <button *ngIf="canEdit()" (click)="onEditClick()"
+                        class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center gap-2 transition-colors">
+                        <i class="fas fa-pencil-alt"></i>
+                        Edit
+                    </button>
+                    <button *ngIf="canDownload()" (click)="downloadCurrentVersion()"
+                        class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center gap-2 transition-colors">
+                        <i class="fas fa-download"></i>
+                        Download
+                    </button>
+                    <button (click)="onClose()"
+                        class="w-9 h-9 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Enhanced Tab Navigation -->
+            <div class="flex space-x-8 mt-8">
+                <button (click)="activeTab = 'details'" class="pb-4 px-2 text-sm font-medium transition-colors relative"
+                    [class.text-indigo-600]="activeTab === 'details'" [class.text-gray-500]="activeTab !== 'details'">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-info-circle"></i>
+                        Details
+                    </div>
+                    <div *ngIf="activeTab === 'details'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600">
+                    </div>
+                </button>
+                <button (click)="activeTab = 'versions'"
+                    class="pb-4 px-2 text-sm font-medium transition-colors relative"
+                    [class.text-indigo-600]="activeTab === 'versions'" [class.text-gray-500]="activeTab !== 'versions'">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-history"></i>
+                        Version History
+                    </div>
+                    <div *ngIf="activeTab === 'versions'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600">
+                    </div>
+                </button>
+                <button (click)="activeTab = 'permissions'"
+                    class="pb-4 px-2 text-sm font-medium transition-colors relative"
+                    [class.text-indigo-600]="activeTab === 'permissions'"
+                    [class.text-gray-500]="activeTab !== 'permissions'">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-lock"></i>
+                        Permissions
+                    </div>
+                    <div *ngIf="activeTab === 'permissions'"
+                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600"></div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-auto">
+            <!-- Details Tab -->
+            <div *ngIf="activeTab === 'details'" class="p-8">
+                <div class="grid grid-cols-3 gap-6">
+                    <!-- Project Info -->
+                    <div class="col-span-2 bg-white rounded-xl border p-6 space-y-6">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Project Information</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-4 bg-gray-50 rounded-lg">
+                                    <p class="text-sm font-medium text-gray-500">Project Name</p>
+                                    <p class="mt-1">{{document.project.name}}</p>
+                                </div>
+                                <div class="p-4 bg-gray-50 rounded-lg">
+                                    <p class="text-sm font-medium text-gray-500">Document Status</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                        <span>Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Document Description -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Description</h3>
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <p class="text-gray-600">{{document.description || 'No description provided.'}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Timeline -->
+                    <div class="bg-white rounded-xl border p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
+                        <div class="space-y-4">
+                            <div *ngFor="let version of versions.slice(0, 3)"
+                                class="relative pl-6 pb-4 border-l border-gray-200 last:pb-0">
+                                <div class="absolute left-0 top-0 -translate-x-1/2 w-2 h-2 rounded-full bg-indigo-600">
+                                </div>
+                                <p class="text-sm font-medium">Version {{version.versionNumber}} uploaded</p>
+                                <p class="text-xs text-gray-500">{{formatDate(version.uploadedAt)}}</p>
+                                <p *ngIf="version.comment" class="text-sm text-gray-600 mt-1">{{version.comment}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Versions Tab -->
+            <div *ngIf="activeTab === 'versions'" class="p-8">
+                <!-- Upload New Version Form -->
+                <div *ngIf="canEdit()" class="mb-8">
+                    <form [formGroup]="uploadForm" (ngSubmit)="uploadNewVersion()"
+                        class="bg-white rounded-xl border p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Upload New Version</h3>
+                        <div class="flex items-center gap-4">
+                            <div class="flex-1">
+                                <input type="file" #fileInput class="hidden" (change)="onFileSelected($event)"
+                                    [accept]="allowedFileTypes.join(',')">
+                                <button type="button" (click)="fileInput.click()"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-left text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-upload mr-2"></i>
+                                    {{selectedFile ? selectedFile.name : 'Select File'}}
+                                </button>
+                            </div>
+                            <div class="flex-1">
+                                <input type="text" formControlName="comment" placeholder="Version comment (optional)"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <button type="submit" [disabled]="!selectedFile"
+                                class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                Upload Version
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Version History List -->
+                <div class="bg-white rounded-xl border">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold text-gray-800">Version History</h3>
+                    </div>
+                    <div class="divide-y">
+                        <div *ngFor="let version of versions" class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <!-- <div class="flex items-center gap-4"> -->
+                                <!-- <div class="h-10 w-10 flex items-center justify-center bg-indigo-100 rounded-lg">
+                                        <i class="fas fa-user text-indigo-600"></i>
+                                    </div> -->
+                                <!-- <div>
+                                        <div class="flex items-center gap-3">
+                                            <span class="font-medium">{{permission.user?.firstName}} {{permission.user?.lastName}}</span>
+                                            <span *ngIf="permission.permissionLevel === DocumentPermissionLevel.Owner" 
+                                                class="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
+                                                Owner
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-1 text-sm text-gray-500">
+                                            <span>{{getPermissionLevelLabel(permission.permissionLevel)}}</span>
+                                        </div>
+                                    </div> -->
+                                <!-- </div> -->
+                                <div *ngIf="getCurrentUserPermissionLevel() === DocumentPermissionLevel.Owner"
+                                    class="flex items-center gap-4">
+                                    <div
+                                        class="h-10 w-10 flex-shrink-0 flex items-center justify-center bg-indigo-100 rounded-lg">
+                                        <i class="fas fa-code-branch text-indigo-600"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-3">
+                                            <p class="font-medium">Version {{version.versionNumber}}</p>
+                                            <span *ngIf="version.id === document.currentVersionId"
+                                                class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">
+                                                Current
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                                            <span>{{formatFileSize(version.fileSize)}}</span>
+                                            <span>•</span>
+                                            <div class="flex items-center gap-2">
+                                                <img [src]="authService.getProfilePictureUrl(version.uploadedBy.profilePicture)"
+                                                    [alt]="version.uploadedBy.firstName" class="w-5 h-5 rounded-full">
+                                                <span>{{version.uploadedBy.firstName}}
+                                                    {{version.uploadedBy.lastName}}</span>
+                                            </div>
+                                            <span>•</span>
+                                            <span>{{formatDate(version.uploadedAt)}}</span>
+                                        </div>
+                                        <p *ngIf="version.comment" class="mt-2 text-sm text-gray-600">
+                                            {{version.comment}}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button *ngIf="canDownload()" (click)="downloadVersion(version)"
+                                    class="p-2 text-gray-500 hover:text-indigo-600 transition-colors">
+                                    <i class="fas fa-download text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Permissions Tab -->
+            <div *ngIf="activeTab === 'permissions'" class="p-8">
+                <div class="bg-white rounded-xl border">
+                    <div class="p-6 border-b flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-800">Access Control</h3>
+                        <button *ngIf="getCurrentUserPermissionLevel() === DocumentPermissionLevel.Owner"
+                            (click)="openAddUserDialog()"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                            <i class="fas fa-user-plus"></i>
+                            Add User
+                        </button>
+                    </div>
+                    <div class="divide-y">
+                        <div *ngFor="let permission of document.permissions"
+                            class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="h-10 w-10 flex items-center justify-center rounded-lg" [ngClass]="{
+                                            'bg-purple-100': permission.permissionLevel === DocumentPermissionLevel.Owner,
+                                            'bg-indigo-100': permission.permissionLevel === DocumentPermissionLevel.Edit,
+                                            'bg-blue-100': permission.permissionLevel === DocumentPermissionLevel.Download,
+                                            'bg-gray-100': permission.permissionLevel === DocumentPermissionLevel.View
+                                        }">
+                                        <i class="fas fa-user text-lg" [ngClass]="{
+                                                'text-purple-600': permission.permissionLevel === DocumentPermissionLevel.Owner,
+                                                'text-indigo-600': permission.permissionLevel === DocumentPermissionLevel.Edit,
+                                                'text-blue-600': permission.permissionLevel === DocumentPermissionLevel.Download,
+                                                'text-gray-600': permission.permissionLevel === DocumentPermissionLevel.View
+                                            }">
+                                        </i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-3">
+                                            <span class="font-medium">{{permission.user.firstName}}
+                                                {{permission.user.lastName}}</span>
+                                            <span *ngIf="permission.permissionLevel === DocumentPermissionLevel.Owner"
+                                                class="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
+                                                Owner
+                                            </span>
+                                        </div>
+                                        <div class="mt-1 flex items-center gap-2">
+                                            <span class="text-sm" [ngClass]="{
+                                                    'text-purple-600': permission.permissionLevel === DocumentPermissionLevel.Owner,
+                                                    'text-indigo-600': permission.permissionLevel === DocumentPermissionLevel.Edit,
+                                                    'text-blue-600': permission.permissionLevel === DocumentPermissionLevel.Download,
+                                                    'text-gray-600': permission.permissionLevel === DocumentPermissionLevel.View
+                                                }">
+                                                <i class="fas fa-circle text-[6px] mr-2"></i>
+                                                {{getPermissionLevelLabel(permission.permissionLevel)}}
+                                            </span>
+                                            <span class="text-sm text-gray-500" *ngIf="permission.user.email">
+                                                • {{permission.user.email}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="getCurrentUserPermissionLevel() === DocumentPermissionLevel.Owner && 
+                                    permission.permissionLevel !== DocumentPermissionLevel.Owner"
+                                    class="flex items-center gap-3">
+                                    <select [(ngModel)]="permission.permissionLevel"
+                                        (change)="updatePermission(permission.userId, $event)" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 
+        focus:border-indigo-500 bg-white text-sm">
+                                        <option selected value="">Select Permission Level</option>
+                                        <option [ngValue]="DocumentPermissionLevel.View">View Only</option>
+                                        <option [ngValue]="DocumentPermissionLevel.Download">Download</option>
+                                        <option [ngValue]="DocumentPermissionLevel.Edit">Edit</option>
+                                    </select>
+                                    <button (click)="removePermission(permission.userId)"
+                                        class="p-2 text-gray-400 hover:text-red-600 transition-colors">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div *ngIf="!document.permissions?.length" class="p-8 text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                            <i class="fas fa-users text-2xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500 font-medium">No users have been granted access yet</p>
+                        <p class="text-sm text-gray-400 mt-1">Click 'Add User' to start sharing this document</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add User Dialog -->
+            <!-- Add User Dialog -->
+            <div *ngIf="showAddUserDialog"
+                class="fixed inset-0 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl w-full max-w-md shadow-2xl">
+                    <div class="px-6 py-4 border-b flex justify-between items-center">
+                        <h3 class="text-lg font-semibold">Add User Access</h3>
+                        <button (click)="closeAddUserDialog()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <!-- User Search Input -->
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-700">Select User</label>
+                                <div class="relative">
+                                    <input type="text" #searchInput [value]="selectedUser?.displayName || ''"
+                                        (input)="onSearchInput($event)" placeholder="Search by name or email..."
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-colors">
+
+                                    <!-- Loading spinner -->
+                                    <div *ngIf="isSearching" class="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <i class="fas fa-spinner fa-spin text-indigo-500"></i>
+                                    </div>
+
+                                    <!-- Search Results Dropdown -->
+                                    <div *ngIf="searchResults.length > 0"
+                                        class="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                                        <div *ngFor="let user of searchResults" (click)="onUserSelect(user)"
+                                            class="p-3 hover:bg-indigo-50 cursor-pointer flex items-center gap-3 transition-colors">
+                                            <div
+                                                class="h-10 w-10 rounded-full overflow-hidden shadow-sm border border-gray-200">
+                                                <img *ngIf="user.profilePicture"
+                                                    [src]="authService.getProfilePictureUrlForAnyUser(user.profilePicture)"
+                                                    [alt]="user.displayName" class="h-full w-full object-cover">
+                                                <div *ngIf="!user.profilePicture"
+                                                    class="h-full w-full bg-indigo-100 flex items-center justify-center">
+                                                    <span class="text-indigo-600 font-medium">
+                                                        {{user.firstName[0]}}{{user.lastName[0]}}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="font-medium text-gray-900">{{user.displayName}}</div>
+                                                <div class="text-sm text-gray-500">{{user.email}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Permission Level Select -->
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Permission Level</label>
+                                <select [(ngModel)]="selectedPermissionLevel"
+                                    class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                    <option [ngValue]="null">Select permission level</option>
+                                    <option [ngValue]="DocumentPermissionLevel.View">View Only</option>
+                                    <option [ngValue]="DocumentPermissionLevel.Download">Download</option>
+                                    <option [ngValue]="DocumentPermissionLevel.Edit">Edit</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-6 flex justify-end gap-3">
+                            <button (click)="closeAddUserDialog()"
+                                class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                                Cancel
+                            </button>
+                            <button (click)="addUserPermission()"
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                Add Access
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Preview Dialog -->
+            <div *ngIf="showPreviewDialog" class="fixed inset-0 z-50 bg-white">
+                <app-document-previewer [document]="document" (close)="onPreviewClose()">
+                </app-document-previewer>
+            </div>

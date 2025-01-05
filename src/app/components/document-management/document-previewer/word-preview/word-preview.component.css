@@ -1,0 +1,84 @@
+.document-content {
+    padding: 2rem;
+    min-height: 100%;
+    transition: transform 0.2s ease;
+}
+
+/* Prevent text selection */
+.document-content {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Fix zoom container */
+.document-content {
+    width: calc(100% / var(--zoom-level, 1));
+    margin: 0 auto;
+}
+
+/* Basic Word document styling from backend HTML */
+:host ::ng-deep {
+    h1 { font-size: 2em; margin-bottom: 1em; }
+    h2 { font-size: 1.5em; margin-bottom: 0.83em; }
+    h3 { font-size: 1.17em; margin-bottom: 0.67em; }
+    p { margin-bottom: 1em; }
+    table { 
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 1em;
+    }
+    td, th { 
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    ul, ol {
+        margin-bottom: 1em;
+        padding-left: 2em;
+    }
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+.document-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 0.83em;
+}
+
+.document-content h3 {
+    font-size: 1.17em;
+    margin-bottom: 0.67em;
+}
+
+.document-content p {
+    margin-bottom: 1em;
+    line-height: 1.5;
+}
+
+.document-content ul,
+.document-content ol {
+    margin-bottom: 1em;
+    padding-left: 2em;
+}
+
+.document-content table {
+    border-collapse: collapse;
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+.document-content td,
+.document-content th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+/* Print prevention */
+@media print {
+    .document-content {
+        display: none;
+    }
+}

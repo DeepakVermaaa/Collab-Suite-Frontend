@@ -1,0 +1,116 @@
+<!-- document-upload.component.html -->
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl w-full max-w-2xl shadow-2xl">
+        <!-- Header -->
+        <div class="px-8 py-6 border-b">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-100 rounded-lg">
+                        <i class="fas fa-upload text-lg text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Upload Document</h2>
+                        <p class="text-sm text-gray-600">Upload a new document to the project</p>
+                    </div>
+                </div>
+                <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()" class="px-8 py-6">
+            <div class="space-y-8">
+                <!-- File Upload with Drag & Drop -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                        File
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <div #dropZone (click)="fileInput.click()"
+                        class="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200"
+                        [class.border-indigo-400]="isDragging" [class.bg-indigo-50]="isDragging"
+                        [class.border-gray-300]="!isDragging" [class.hover:bg-gray-50]="!isDragging">
+
+                        <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)"
+                            [accept]="allowedExtensions.join(',')" (click)="$event.stopPropagation()">
+                        <!-- Add this to prevent double triggering -->
+
+                        <div *ngIf="!selectedFile" class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <i class="fas fa-cloud-upload-alt text-4xl" [class.text-indigo-500]="isDragging"
+                                [class.text-gray-400]="!isDragging"></i>
+                            <p class="mt-4 text-sm text-gray-500">
+                                <span class="font-semibold">{{isDragging ? 'Drop file here' : 'Click to upload'}}</span>
+                                {{isDragging ? '' : ' or drag and drop'}}
+                            </p>
+                            <p class="text-xs text-gray-500 mt-2">
+                                Allowed files: PDF, DOC, DOCX, XLS, XLSX, TXT (Max. 100MB)
+                            </p>
+                        </div>
+
+                        <div *ngIf="selectedFile" class="flex flex-col items-center justify-center py-6">
+                            <i class="fas fa-file text-4xl text-indigo-500 mb-3"></i>
+                            <p class="text-sm font-medium text-gray-900">
+                                {{ selectedFile.name }}
+                            </p>
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ formatFileSize(selectedFile.size) }}
+                            </p>
+                            <button type="button"
+                                (click)="selectedFile = null; fileInput.value = ''; $event.stopPropagation()"
+                                class="mt-3 text-sm text-red-500 hover:text-red-600">
+                                Remove file
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Name -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                        Document Name
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" formControlName="name" [class.border-red-500]="nameErrors"
+                        class="w-full px-4 py-3 rounded-lg border bg-gray-50 focus:bg-white transition-colors"
+                        [ngClass]="{'border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200': !nameErrors}"
+                        placeholder="Enter document name">
+                    <p *ngIf="nameErrors" class="text-sm text-red-500 mt-1">{{ nameErrors }}</p>
+                </div>
+
+                <!-- Description -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700">
+                        Description
+                    </label>
+                    <textarea formControlName="description" rows="3"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors resize-none"
+                        placeholder="Enter document description"></textarea>
+                </div>
+
+                <!-- Version Comment -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700">
+                        Version Comment
+                    </label>
+                    <input type="text" formControlName="comment"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors"
+                        placeholder="Enter version comment">
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-end gap-4 mt-8 pt-6 border-t">
+                <button type="button" (click)="onCancel()"
+                    class="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" [disabled]="!uploadForm.valid || !selectedFile" style="background-color: #667eea;"
+                    class="px-6 py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    Upload Document
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

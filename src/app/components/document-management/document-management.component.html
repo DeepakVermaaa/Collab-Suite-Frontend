@@ -1,0 +1,234 @@
+<div class="min-h-screen bg-gray-100">
+    <!-- Header Section -->
+    <div class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-full px-6 py-4">
+            <div class="flex justify-between items-center">
+                <p class="text-md-start text-gray-500 mt-1">Manage and organize your project documents</p>
+                <button *ngIf="selectedProject" (click)="openUploadDialog()"
+                    class="btn-modern text-white hover:from-indigo-700 hover:to-blue-600 px-4 py-2 rounded-lg flex items-center gap-2"
+                    style="background-color: #667eea;">
+                    <i class="fas fa-upload"></i>
+                    Upload Document
+                </button>
+            </div>
+
+            <!-- Search and Filters -->
+            <div *ngIf="selectedProject" class="flex flex-wrap gap-4 mt-4">
+                <div class="flex-grow relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" [(ngModel)]="filterParams.searchQuery" (input)="onSearch($event)"
+                        placeholder="Search by document name or description..."
+                        class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                </div>
+                <select [(ngModel)]="filterParams.fileType" (change)="onFileTypeChange($event)"
+                    class="px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all min-w-[150px]">
+                    <option value="">All File Types</option>
+                    <option *ngFor="let type of allowedFileTypes" [value]="type">
+                        {{type.toUpperCase().replace('.', '')}}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-full px-6 py-8">
+        <!-- Recent Documents -->
+        <div class="mb-8" *ngIf="!selectedProject">
+            <div class="flex items-center gap-3 mb-6">
+                <!-- <div class="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500">
+                    <i class="fas fa-clock text-white"></i>
+                </div> -->
+                <h2 class="text-xl font-semibold text-gray-800">Recent Documents</h2>
+            </div>
+
+            <!-- Recent Documents Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Empty State -->
+                <div *ngIf="recentDocuments.length === 0"
+                    class="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                        <i class="fas fa-file text-3xl text-gray-400"></i>
+                    </div>
+                    <p class="text-gray-500 font-medium">No recent documents</p>
+                </div>
+
+                <!-- Document Cards -->
+                <div *ngFor="let doc of recentDocuments"
+                    class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-all cursor-pointer group"
+                    (click)="showDocumentDetails(doc)">
+                    <div class="flex items-start gap-4">
+                        <!-- File Type Icon -->
+                        <div class="rounded-lg p-3 transition-all" [ngClass]="{
+                                'bg-blue-100 text-blue-600': doc.fileExtension === '.pdf',
+                                'bg-red-100 text-red-600': doc.fileExtension === '.doc' || doc.fileExtension === '.docx',
+                                'bg-green-100 text-green-600': doc.fileExtension === '.xls' || doc.fileExtension === '.xlsx',
+                                'bg-purple-100 text-purple-600': doc.fileExtension === '.txt'
+                            }">
+                            <i class="fas {{getFileIcon(doc.fileExtension)}} text-lg"></i>
+                        </div>
+
+                        <!-- Document Info -->
+                        <div class="flex-grow min-w-0">
+                            <h3 class="font-medium text-gray-900 mb-2 truncate">{{doc.name}}</h3>
+                            <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
+                                <span>{{formatFileSize(doc.fileSize)}}</span>
+                                <div class="w-1 h-1 rounded-full bg-gray-300"></div>
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <img [src]="authService.getProfilePictureUrl(doc.uploadedBy.profilePicture)"
+                                        [alt]="doc.uploadedBy.firstName" class="w-6 h-6 rounded-full object-cover">
+                                    <span class="truncate">{{doc.uploadedBy.firstName}}
+                                        {{doc.uploadedBy.lastName}}</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">{{doc.uploadedAt | date:'MMM d, y'}}</span>
+                                <div
+                                    class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    
+                                    <button *ngIf="canDownloadDocument(doc)" (click)="downloadDocument(doc, $event)"
+                                        class="p-2 text-gray-500 hover:text-blue-600 transition-colors">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button *ngIf="canDeleteDocument(doc)" (click)="deleteDocument(doc, $event)"
+                                        class="p-2 text-gray-500 hover:text-red-600 transition-colors">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects Section -->
+        <div>
+            <!-- Section Header -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <!-- <div class="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500">
+                        <i class="fas fa-folder text-white"></i>
+                    </div> -->
+                    <h2 class="text-xl font-semibold text-gray-800">
+                        {{ selectedProject ? selectedProject.name + ' Documents' : 'Project Folders' }}
+                    </h2>
+                </div>
+                <button *ngIf="selectedProject" (click)="selectedProject = null"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg flex items-center gap-2 transition-colors border border-gray-200">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Projects
+                </button>
+            </div>
+
+            <!-- Projects Grid -->
+            <div *ngIf="!selectedProject" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div *ngFor="let project of projects" (click)="selectProject(project)"
+                    class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all cursor-pointer group">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="p-3 rounded-lg bg-indigo-100 text-indigo-600 group-hover:bg-indigo-100 transition-colors">
+                                <i class="fas fa-folder-open text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 mb-1">{{project.name}}</h3>
+                                <p class="text-sm text-gray-500">
+                                    {{project.documents?.length || 0}} documents
+                                </p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition-colors"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Documents List -->
+            <div *ngIf="selectedProject" class="bg-white rounded-xl border border-gray-200">
+                <!-- Empty State -->
+                <div *ngIf="!selectedProject.documents?.length" class="text-center py-12">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                        <i class="fas fa-file text-3xl text-gray-400"></i>
+                    </div>
+                    <p class="text-gray-500 font-medium mb-4">No documents in this project</p>
+                    <button (click)="openUploadDialog()"
+                        class="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+                        Upload your first document
+                    </button>
+                </div>
+
+                <!-- Documents List -->
+                <div *ngFor="let doc of selectedProject.documents"
+                    class="p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer group"
+                    (click)="showDocumentDetails(doc)">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="rounded-lg p-3 transition-all" [ngClass]="{
+                                    'bg-blue-100 text-blue-600': doc.fileExtension === '.pdf',
+                                    'bg-red-100 text-red-600': doc.fileExtension === '.doc' || doc.fileExtension === '.docx',
+                                    'bg-green-100 text-green-600': doc.fileExtension === '.xls' || doc.fileExtension === '.xlsx',
+                                    'bg-purple-100 text-purple-600': doc.fileExtension === '.txt'
+                                }">
+                                <i class="fas {{getFileIcon(doc.fileExtension)}} text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium text-gray-900 mb-1">{{doc.name}}</h3>
+                                <div class="flex items-center gap-3 text-sm text-gray-500">
+                                    <span>{{formatFileSize(doc.fileSize)}}</span>
+                                    <div class="w-1 h-1 rounded-full bg-gray-300"></div>
+                                    <div class="flex items-center gap-2">
+                                        <img [src]="authService.getProfilePictureUrl(doc.uploadedBy.profilePicture)"
+                                            [alt]="doc.uploadedBy.firstName" class="w-6 h-6 rounded-full object-cover">
+                                        <span>{{doc.uploadedBy.firstName}} {{doc.uploadedBy.lastName}}</span>
+                                    </div>
+                                    <div class="w-1 h-1 rounded-full bg-gray-300"></div>
+                                    <span>{{doc.uploadedAt | date:'medium'}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button *ngIf="canDownloadDocument(doc)" (click)="downloadDocument(doc, $event)"
+                                class="p-2 text-gray-500 hover:text-blue-600 transition-colors">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button *ngIf="canDeleteDocument(doc)" (click)="deleteDocument(doc, $event)"
+                                class="p-2 text-gray-500 hover:text-red-600 transition-colors">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div *ngIf="selectedProject.documents?.length" class="p-4 border-t border-gray-200">
+                    <div class="flex justify-end gap-3">
+                        <button [disabled]="(filterParams.pageNumber || 1) === 1"
+                            (click)="onPageChange((filterParams.pageNumber || 1) - 1)"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out">
+                            <i class="fas fa-chevron-left mr-2"></i>
+                            Previous
+                        </button>
+                        <div
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-lg">
+                            Page {{filterParams.pageNumber || 1}}
+                        </div>
+                        <button (click)="onPageChange((filterParams.pageNumber || 1) + 1)"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 ease-in-out">
+                            Next
+                            <i class="fas fa-chevron-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Dialog -->
+<app-document-upload *ngIf="showUploadDialog" [projectId]="selectedProject?.id" (close)="closeUploadDialog()">
+</app-document-upload>
+
+<!-- Document Details Dialog -->
+<app-document-details *ngIf="showDocumentDetail && selectedDocument" [document]="selectedDocument"
+    (close)="closeDocumentDetails()" (documentUpdated)="onDocumentUpdated()">
+</app-document-details>

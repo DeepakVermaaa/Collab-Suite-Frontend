@@ -103,7 +103,7 @@
                   'bg-yellow-100 text-yellow-800': project.progress > 0 && project.progress < 100,
                   'bg-gray-100 text-gray-800': project.progress === 0
                 }">
-                {{project.progress}}% Complete
+                {{project.progress | number:'1.0-0'}}% Complete
               </span>
             </div>
           </div>

@@ -1,0 +1,67 @@
+<div class="h-full flex flex-col">
+    <!-- View-only indicator -->
+    <div class="bg-gray-100 px-4 py-2 border-b">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <i class="fas fa-eye"></i>
+                <span>Protected View</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <!-- Line numbers toggle -->
+                <button (click)="toggleLineNumbers()" 
+                        class="p-2 text-gray-600 hover:text-gray-800 transition-colors"
+                        [class.text-indigo-600]="showLineNumbers">
+                    <i class="fas fa-list-ol"></i>
+                </button>
+                <!-- Zoom controls -->
+                <button (click)="zoomIn()" 
+                        class="p-2 text-gray-600 hover:text-gray-800 transition-colors"
+                        [disabled]="currentZoom >= maxZoom">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button (click)="zoomOut()" 
+                        class="p-2 text-gray-600 hover:text-gray-800 transition-colors"
+                        [disabled]="currentZoom <= minZoom">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <span class="text-sm text-gray-500">{{(currentZoom * 100).toFixed(0)}}%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex-1 flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+            <p class="text-gray-600">Loading text file...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="flex-1 flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
+            </div>
+            <p class="text-red-600 font-medium mb-2">{{error}}</p>
+            <p class="text-sm text-red-500">Please try again or download the file</p>
+        </div>
+    </div>
+
+    <!-- Text Content -->
+    <div *ngIf="!loading && !error" class="flex-1 overflow-auto bg-gray-50">
+        <div class="max-w-5xl mx-auto bg-white shadow-sm p-6">
+            <pre [style.transform]="'scale(' + currentZoom + ')'"
+                 [style.transform-origin]="'top left'"
+                 class="font-mono text-sm whitespace-pre-wrap break-words">
+                <ng-container *ngIf="showLineNumbers">
+                    <ng-container *ngFor="let line of lines; let i = index">
+                        <span class="text-gray-400 select-none mr-4">{{formatLineNumber(i)}}</span>{{line}}
+                        <ng-container *ngIf="i < lines.length - 1">&#10;</ng-container>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngIf="!showLineNumbers">{{content}}</ng-container>
+            </pre>
+        </div>
+    </div>
+</div>
